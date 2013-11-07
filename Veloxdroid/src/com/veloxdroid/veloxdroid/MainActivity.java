@@ -8,6 +8,8 @@ public class MainActivity extends Activity {
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
+		// Example
+		// just a comment to try fetching 
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
 	}
