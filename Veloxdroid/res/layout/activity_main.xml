@@ -40,4 +40,13 @@
         android:text="@string/button_visitatore" 
         android:onClick="doVisitatore"/>
 
+    <Button
+        android:id="@+id/button_register"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@+id/button_login"
+        android:layout_below="@+id/button_login"
+        android:text="@string/button_register"
+        android:onClick="doRegister" />
+
 </RelativeLayout>

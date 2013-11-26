@@ -2,6 +2,8 @@ package com.veloxdroid.veloxdroid;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
@@ -20,6 +22,7 @@ import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.text.TextUtils;
+import android.util.Base64;
 import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.View;
@@ -206,39 +209,53 @@ public class LoginActivity extends Activity {
 		@Override
 		protected Boolean doInBackground(Void... params) {
 			
-			HttpClient client = new DefaultHttpClient();
-			StringEntity stringEnt = null;
-			Boolean toReturn = false;
-			try {
-				stringEnt = new StringEntity("mail=" + mEmail + "&pw=" + mPassword);
-			} catch (UnsupportedEncodingException e1) {
-				// TODO Auto-generated catch block
-				e1.printStackTrace();
-			}
-			HttpPost post = new HttpPost("http://10.0.2.2:8080/VDLoginServer/login/doLogin");
-			post.addHeader("content-type", "application/x-www-form-urlencoded");
-			post.setEntity(stringEnt);
-
-			try {
-				HttpResponse response = client.execute(post);
-				HttpEntity responseEntity = response.getEntity();
-				String responseString = EntityUtils.toString(responseEntity);
-				if (responseString.contains("OK")) {
-					toReturn = true;
-				} else {
-					toReturn = false;
-				}
-			} catch (UnsupportedEncodingException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			} catch (ClientProtocolException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}			
-			return toReturn;
+			return false;
+			
+//			try {
+//				MessageDigest digester = MessageDigest.getInstance("MD5");
+//				digester.update(mPassword.getBytes(), 0, mPassword.length()-1);
+//				byte[] rawDigest = digester.digest();
+//				byte[] encoded = Base64.encode(rawDigest, Base64.DEFAULT);
+//		        String base64_MD5_password = new String(encoded);
+//		        
+//			} catch (NoSuchAlgorithmException e2) {
+//				// TODO Auto-generated catch block
+//				e2.printStackTrace();
+//			}
+//			
+//			HttpClient client = new DefaultHttpClient();
+//			StringEntity stringEnt = null;
+//			Boolean toReturn = false;
+//			try {
+//				stringEnt = new StringEntity("mail=" + mEmail + "&pw=" + mPassword);
+//			} catch (UnsupportedEncodingException e1) {
+//				// TODO Auto-generated catch block
+//				e1.printStackTrace();
+//			}
+//			HttpPost post = new HttpPost("http://10.0.2.2:8080/VDLoginServer/login/doLogin");
+//			post.addHeader("content-type", "application/x-www-form-urlencoded");
+//			post.setEntity(stringEnt);
+//
+//			try {
+//				HttpResponse response = client.execute(post);
+//				HttpEntity responseEntity = response.getEntity();
+//				String responseString = EntityUtils.toString(responseEntity);
+//				if (responseString.contains("OK")) {
+//					toReturn = true;
+//				} else {
+//					toReturn = false;
+//				}
+//			} catch (UnsupportedEncodingException e) {
+//				// TODO Auto-generated catch block
+//				e.printStackTrace();
+//			} catch (ClientProtocolException e) {
+//				// TODO Auto-generated catch block
+//				e.printStackTrace();
+//			} catch (IOException e) {
+//				// TODO Auto-generated catch block
+//				e.printStackTrace();
+//			}			
+//			return toReturn;
 		}
 
 		@Override

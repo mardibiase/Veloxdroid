@@ -96,6 +96,11 @@ public class MainActivity extends Activity {
 		startActivity(intent);
 	}
 	
+	public void doRegister(View view){
+		Intent intent = new Intent(this, RegisterActivity.class);
+		startActivity(intent);
+	}
+	
 	
 	private class DownloadTask extends AsyncTask<String, Integer, String> {
 

@@ -9,5 +9,6 @@
     <string name="title_activity_download">DownloadActivity</string>
     <string name="button_login">Login</string>
 	<string name="button_visitatore">Visitatore</string>
+	<string name="button_register">Register</string>
 </resources>
 
