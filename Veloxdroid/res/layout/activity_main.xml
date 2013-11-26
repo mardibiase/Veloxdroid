@@ -8,9 +8,36 @@
     android:paddingTop="@dimen/activity_vertical_margin"
     tools:context=".MainActivity" >
 
-    <TextView
+    <Button
+        android:id="@+id/button_downloadFiles"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="@string/hello_world" />
+        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="77dp"
+        android:text="@string/downloadFile_button"
+        android:onClick="downloadFiles" />
+
+    <Button
+        android:id="@+id/button_login"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_below="@+id/button_downloadFiles"
+        android:layout_marginLeft="63dp"
+        android:layout_marginTop="69dp"
+        android:text="@string/button_login"
+        android:onClick="doLogin" />
+
+    <Button
+        android:id="@+id/button_visitatore"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignBaseline="@+id/button_login"
+        android:layout_alignBottom="@+id/button_login"
+        android:layout_marginLeft="40dp"
+        android:layout_toRightOf="@+id/button_login"
+        android:text="@string/button_visitatore" 
+        android:onClick="doVisitatore"/>
 
 </RelativeLayout>
