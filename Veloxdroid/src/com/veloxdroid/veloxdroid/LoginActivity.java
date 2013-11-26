@@ -18,6 +18,8 @@ import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.annotation.TargetApi;
 import android.app.Activity;
+import android.content.Intent;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
@@ -50,7 +52,7 @@ public class LoginActivity extends Activity {
 	// Values for email and password at the time of the login attempt.
 	private String mEmail;
 	private String mPassword;
-
+	private String loginResult;
 	// UI references.
 	private EditText mEmailView;
 	private EditText mPasswordView;
@@ -208,64 +210,67 @@ public class LoginActivity extends Activity {
 	public class UserLoginTask extends AsyncTask<Void, Void, Boolean> {
 		@Override
 		protected Boolean doInBackground(Void... params) {
-			
-			return false;
-			
-//			try {
-//				MessageDigest digester = MessageDigest.getInstance("MD5");
-//				digester.update(mPassword.getBytes(), 0, mPassword.length()-1);
-//				byte[] rawDigest = digester.digest();
-//				byte[] encoded = Base64.encode(rawDigest, Base64.DEFAULT);
-//		        String base64_MD5_password = new String(encoded);
-//		        
-//			} catch (NoSuchAlgorithmException e2) {
-//				// TODO Auto-generated catch block
-//				e2.printStackTrace();
-//			}
-//			
-//			HttpClient client = new DefaultHttpClient();
-//			StringEntity stringEnt = null;
-//			Boolean toReturn = false;
-//			try {
-//				stringEnt = new StringEntity("mail=" + mEmail + "&pw=" + mPassword);
-//			} catch (UnsupportedEncodingException e1) {
-//				// TODO Auto-generated catch block
-//				e1.printStackTrace();
-//			}
-//			HttpPost post = new HttpPost("http://10.0.2.2:8080/VDLoginServer/login/doLogin");
-//			post.addHeader("content-type", "application/x-www-form-urlencoded");
-//			post.setEntity(stringEnt);
-//
-//			try {
-//				HttpResponse response = client.execute(post);
-//				HttpEntity responseEntity = response.getEntity();
-//				String responseString = EntityUtils.toString(responseEntity);
-//				if (responseString.contains("OK")) {
-//					toReturn = true;
-//				} else {
-//					toReturn = false;
-//				}
-//			} catch (UnsupportedEncodingException e) {
-//				// TODO Auto-generated catch block
-//				e.printStackTrace();
-//			} catch (ClientProtocolException e) {
-//				// TODO Auto-generated catch block
-//				e.printStackTrace();
-//			} catch (IOException e) {
-//				// TODO Auto-generated catch block
-//				e.printStackTrace();
-//			}			
-//			return toReturn;
+			String base64_MD5_password = null;
+			try {
+				MessageDigest digester = MessageDigest.getInstance("MD5");
+				digester.update(mPassword.getBytes(), 0, mPassword.length()-1);
+				byte[] rawDigest = digester.digest();
+				byte[] encoded = Base64.encode(rawDigest, Base64.DEFAULT);
+		        base64_MD5_password = new String(encoded);		        
+			} catch (NoSuchAlgorithmException e2) {
+				// TODO Auto-generated catch block
+				e2.printStackTrace();
+			}			
+			HttpClient client = new DefaultHttpClient();
+			StringEntity stringEnt = null;
+			Boolean toReturn = false;
+			try {
+				stringEnt = new StringEntity("mail=" + mEmail + "&pw=" + base64_MD5_password);
+			} catch (UnsupportedEncodingException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
+			HttpPost post = new HttpPost("http://10.0.2.2:8080/VDServer/login");
+			post.addHeader("content-type", "application/x-www-form-urlencoded");
+			post.setEntity(stringEnt);
+
+			try {
+				HttpResponse response = client.execute(post);
+				HttpEntity responseEntity = response.getEntity();
+				String responseString = EntityUtils.toString(responseEntity);
+				System.out.println(responseString);
+				if (responseString.contains("OK") || responseString.contains("REG")){
+					loginResult = responseString;
+					toReturn = true;
+				}
+				else {
+					loginResult = "NO";
+					toReturn = false;					
+				}
+			} catch (UnsupportedEncodingException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (ClientProtocolException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			return toReturn;
 		}
 
 		@Override
 		protected void onPostExecute(final Boolean success) {
 			mAuthTask = null;
 			showProgress(false);
-
+			Intent resultIntent = null;
 			if (success) {
-				finish();
-				//call altra activity dopo login
+				resultIntent = new Intent();
+				Uri temp = Uri.parse(loginResult);
+				resultIntent.setData(temp);
+				setResult(Activity.RESULT_OK, resultIntent);
+				finish();										
 			} else {
 				mPasswordView.setError(getString(R.string.error_incorrect_password));
 				mPasswordView.requestFocus();

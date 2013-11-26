@@ -92,14 +92,28 @@ public class MainActivity extends Activity {
 	}
 	
 	public void doLogin(View view){
+		int requestCode = 99;
 		Intent intent = new Intent(this, LoginActivity.class);
-		startActivity(intent);
+		startActivityForResult(intent, requestCode);
 	}
 	
-	public void doRegister(View view){
-		Intent intent = new Intent(this, RegisterActivity.class);
-		startActivity(intent);
+	@Override
+	protected void onActivityResult(int aRequestCode, int aResultCode, Intent aData){
+		switch(aRequestCode){
+		case 99: {
+			String result = aData.getData().toString();
+			Toast toast = Toast.makeText(getApplicationContext(),
+					result, 10);
+			toast.show();
+			break;
+			}
+		}
 	}
+	
+//	public void doRegister(View view){
+//		Intent intent = new Intent(this, RegisterActivity.class);
+//		startActivity(intent);
+//	}
 	
 	
 	private class DownloadTask extends AsyncTask<String, Integer, String> {
