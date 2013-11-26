@@ -46,7 +46,10 @@
             android:label="@string/title_activity_login"
             android:windowSoftInputMode="adjustResize|stateVisible" >
         </activity>
-       
+        <activity
+            android:name="com.veloxdroid.veloxdroid.NavigationActivity"
+            android:label="@string/title_activity_navigation" >
+        </activity>
     </application>
 
 </manifest>

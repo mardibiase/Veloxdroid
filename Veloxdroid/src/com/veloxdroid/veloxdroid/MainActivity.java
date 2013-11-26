@@ -25,7 +25,7 @@ import android.widget.Toast;
 
 public class MainActivity extends Activity {
 
-	final String PREFS_NAME = "vdPreferences";
+	public static final String PREFS_NAME = "vdPreferences";
 	private static String file_url = "http://www.robotstxt.org/robotstxt.html";
 	private ProgressDialog mProgressDialog;
 
@@ -45,6 +45,9 @@ public class MainActivity extends Activity {
 	@Override
 	protected void onStart() {
 		super.onStart();
+		//se l'utente è già registrato ed ha già fatto login
+		//direttamente passa nella schermata di "navigazione" 
+		//altrimenti: checkFirstTimeUsage
 		checkFirstTimeUsage();
 	}
 
@@ -92,7 +95,7 @@ public class MainActivity extends Activity {
 	}
 	
 	public void doLogin(View view){
-		int requestCode = 99;
+		int requestCode = 99; //hardcoded
 		Intent intent = new Intent(this, LoginActivity.class);
 		startActivityForResult(intent, requestCode);
 	}
@@ -100,11 +103,13 @@ public class MainActivity extends Activity {
 	@Override
 	protected void onActivityResult(int aRequestCode, int aResultCode, Intent aData){
 		switch(aRequestCode){
-		case 99: {
+		case 99: { //hardcoded in doLogin
 			String result = aData.getData().toString();
 			Toast toast = Toast.makeText(getApplicationContext(),
 					result, 10);
 			toast.show();
+			Intent intent = new Intent(this, NavigationActivity.class);
+			startActivity(intent);
 			break;
 			}
 		}

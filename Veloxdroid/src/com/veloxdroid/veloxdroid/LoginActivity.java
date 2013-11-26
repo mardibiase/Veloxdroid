@@ -19,6 +19,7 @@ import android.animation.AnimatorListenerAdapter;
 import android.annotation.TargetApi;
 import android.app.Activity;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Build;
@@ -270,6 +271,8 @@ public class LoginActivity extends Activity {
 				Uri temp = Uri.parse(loginResult);
 				resultIntent.setData(temp);
 				setResult(Activity.RESULT_OK, resultIntent);
+				SharedPreferences settings = getSharedPreferences(MainActivity.PREFS_NAME, 0);
+				settings.edit().putString("eMail", mEmail).commit();
 				finish();										
 			} else {
 				mPasswordView.setError(getString(R.string.error_incorrect_password));

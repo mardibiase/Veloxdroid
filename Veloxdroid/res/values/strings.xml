@@ -8,7 +8,8 @@
     <string name="title_activity_download_file">DownloadFileActivity</string>
     <string name="title_activity_download">DownloadActivity</string>
     <string name="button_login">Login</string>
-	<string name="button_visitatore">Visitatore</string>
-	<string name="button_register">Register</string>
-</resources>
+    <string name="button_visitatore">Visitatore</string>
+    <string name="button_register">Register</string>
+    <string name="title_activity_navigation">NavigationActivity</string>
 
+</resources>
