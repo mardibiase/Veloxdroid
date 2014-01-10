@@ -1,0 +1,16 @@
+<resources>
+
+    <string name="title_activity_register">Register</string>
+
+    <!-- Strings related to login -->
+    <string name="register_email">Email</string>
+    <string name="register_password">Password</string>
+    <string name="register_re_password">Re Password</string>
+    <string name="action_register"><b>Register</b> Register</string>
+    <string name="register_progress_registering">Registering…</string>
+    <string name="register_error_invalid_email">This email address is invalid</string>
+    <string name="register_error_invalid_password">This password is too short</string>
+    <string name="register_error_incorrect_password">This password is incorrect</string>
+    <string name="register_error_field_required">This field is required</string>
+
+</resources>
