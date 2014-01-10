@@ -4,6 +4,8 @@ import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.StringTokenizer;
@@ -22,10 +24,14 @@ import com.veloxdroid.beans.Autovelox.Type;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
+import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Bundle;
+import android.util.Base64;
 import android.view.Menu;
 import android.view.View;
 import android.widget.TextView;
@@ -36,7 +42,7 @@ import android.widget.Toast;
  * To Do:
  * 
  * Aggiungere la gestione degli autovelox mobili (secondo file)
- * Ricerca dei fissi e dei mobili al fine di ottenere un unico risultato (autovelox pi� vicino)
+ * Ricerca dei fissi e dei mobili al fine di ottenere un unico risultato (autovelox pi� vicino)
  * */
 
 public class NavigationActivity extends Activity implements LocationListener{
@@ -45,14 +51,14 @@ public class NavigationActivity extends Activity implements LocationListener{
 	private LocationManager lm;
 	private TextView txtInfo;
 	private ArrayList<Autovelox> autoveloxes;
-	
+
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_navigation);
 		txtInfo = (TextView) findViewById(R.id.txtInfo);
 		lm =(LocationManager) getSystemService(LOCATION_SERVICE);
-		
+
 		autoveloxes = new ArrayList<Autovelox>();
 	}
 
@@ -75,7 +81,7 @@ public class NavigationActivity extends Activity implements LocationListener{
 		return true;
 	}
 
-	
+
 	@Override
 	public void onLocationChanged(Location location) {
 		// TODO Auto-generated method stub
@@ -87,10 +93,10 @@ public class NavigationActivity extends Activity implements LocationListener{
 		// ipotizzando che venga rilevato un autovelox dentro il range prefissato, 
 		// dobbiamo passare il controllo al metodo public float distanceTo (Location dest)
 		// in modo da calcolare precisamente la distanza e dunque mostrare a video tutte le info
-		
+
 		// Aggiorna l'ultima posizione
 		lastKnowLocation = new Location(location);
-		
+
 		txtInfo.setText("Latitude: " + location.getLatitude() + " Logitude: " + location.getLongitude());
 		Autovelox autovelox = null;
 		try {
@@ -114,7 +120,7 @@ public class NavigationActivity extends Activity implements LocationListener{
 		//creazione di un bufferedreader per file csv degli autovelox
 		BufferedReader br = new BufferedReader(new FileReader(path));
 		String line;
-		
+
 		Type type;
 		if (path.contains("Fissi"))
 			type = Type.FISSO;
@@ -122,7 +128,7 @@ public class NavigationActivity extends Activity implements LocationListener{
 			type = Type.MOBILE;
 		else
 			type = Type.ALTRO;
-			
+
 
 		//while per leggere dal bufferedreader 
 		while((line = br.readLine()) != null){
@@ -154,7 +160,7 @@ public class NavigationActivity extends Activity implements LocationListener{
 				autovelox.getLocation().setLatitude(latit);
 				autovelox.getLocation().setLongitude(longit);
 				autovelox.setType(type);
-				
+
 				//cerca il limite di velocità di tale autovelox - contenuto nell'altro stringtokenizer 
 				while (st2.hasMoreElements()) {
 					String nextElem = st2.nextElement().toString();
@@ -170,9 +176,9 @@ public class NavigationActivity extends Activity implements LocationListener{
 			}
 		}
 		br.close();
-		
+
 	}
-	
+
 	private Autovelox findNearestAutovelox(ArrayList<Autovelox> autoveloxes, Location location){
 
 		//ricerca l'autovelox più in prossimità tra quelli trovati rispetto alla location fornita 
@@ -211,60 +217,71 @@ public class NavigationActivity extends Activity implements LocationListener{
 		// TODO Auto-generated method stub
 
 	}
-	
-	public void doSendAutovelox(View view){
-		
-		Toast toast;
-		
-		
-		
-		if (lastKnowLocation != null){
-			toast = Toast.makeText(getApplicationContext(), "Uploaded: " + lastKnowLocation.getLatitude(), 10);
-			toast.show();
-			
-			double lat = lastKnowLocation.getLatitude();
-			double lon = lastKnowLocation.getLongitude();
-			StringEntity ent = null;
-			try {
-				ent = new StringEntity("latit=" + lat + "longit=" + lon);
-			} catch (UnsupportedEncodingException e1) {
-				// TODO Auto-generated catch block
-				e1.printStackTrace();
-			}
-			
-			HttpClient client = new DefaultHttpClient();
-			HttpPost post = new HttpPost("http://10.0.2.2:8080/VDServer/upload");
-			post.addHeader("content-type", "application/x-www-form-urlencoded");
-			post.setEntity(ent);
 
-			try {
-				HttpResponse response = client.execute(post);
-				HttpEntity responseEntity = response.getEntity();
-				String responseString = EntityUtils.toString(responseEntity);
-				System.out.println(responseString);
-				if (responseString.contains("OK")){
-					toast = Toast.makeText(getApplicationContext(), "Uploaded", 10);
-					toast.show();
+	/**
+	 * Represents an asynchronous upload task used to send the Autovelox
+	 */
+	public class UploadTask extends AsyncTask<Void, Void, Boolean> {
+		@Override
+		protected Boolean doInBackground(Void... params) {
+			Toast toast;		
+
+			if (lastKnowLocation != null){
+
+				double lat = lastKnowLocation.getLatitude();
+				double lon = lastKnowLocation.getLongitude();
+				StringEntity ent = null;
+				try {
+					ent = new StringEntity("latit=" + lat + "&longit=" + lon);
+				} catch (UnsupportedEncodingException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
 				}
-				else {
-					toast = Toast.makeText(getApplicationContext(), "Error", 10);
-					toast.show();
+
+				HttpClient client = new DefaultHttpClient();
+				HttpPost post = new HttpPost("http://10.0.2.2:8080/VDServer/upload");
+				post.addHeader("content-type", "application/x-www-form-urlencoded");
+				post.setEntity(ent);
+
+				try {
+					HttpResponse response = client.execute(post);
+					HttpEntity responseEntity = response.getEntity();
+					String responseString = EntityUtils.toString(responseEntity);
+					System.out.println(responseString);
+					if (responseString.contains("OK")){
+						toast = Toast.makeText(getApplicationContext(), "Uploaded", 10);
+						toast.show();
+					}
+					else {
+						toast = Toast.makeText(getApplicationContext(), "Error", 10);
+						toast.show();
+					}
+				} catch (UnsupportedEncodingException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				} catch (ClientProtocolException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}	catch (Exception e){
+					e.printStackTrace();
 				}
-			} catch (UnsupportedEncodingException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			} catch (ClientProtocolException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+
+			} else {
+				toast = Toast.makeText(getApplicationContext(), "No location pixed", 10);
+				toast.show();
 			}
-		} else {
-			toast = Toast.makeText(getApplicationContext(), "No location pixed", 10);
-			toast.show();
+			return true;			
 		}
-		
+
+	}
+
+	public void doSendAutovelox(View view){
+		UploadTask task = new UploadTask();
+		task.execute();
+
 	}
 
 }
