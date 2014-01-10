@@ -10,6 +10,7 @@
     <string name="button_login">Login</string>
     <string name="button_visitatore">Visitatore</string>
     <string name="button_register">Register</string>
+    <string name="button_send_autovelox">Send Autovelox</string>
     <string name="title_activity_navigation">NavigationActivity</string>
 
 </resources>

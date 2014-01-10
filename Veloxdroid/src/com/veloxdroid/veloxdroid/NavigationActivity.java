@@ -3,9 +3,22 @@ package com.veloxdroid.veloxdroid;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.StringTokenizer;
+
+import org.apache.http.HttpEntity;
+import org.apache.http.HttpResponse;
+import org.apache.http.client.ClientProtocolException;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.entity.StringEntity;
+import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.util.EntityUtils;
+
+import com.veloxdroid.beans.Autovelox;
+import com.veloxdroid.beans.Autovelox.Type;
 
 import android.app.Activity;
 import android.content.Intent;
@@ -14,19 +27,33 @@ import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Bundle;
 import android.view.Menu;
+import android.view.View;
 import android.widget.TextView;
+import android.widget.Toast;
+
+
+/*
+ * To Do:
+ * 
+ * Aggiungere la gestione degli autovelox mobili (secondo file)
+ * Ricerca dei fissi e dei mobili al fine di ottenere un unico risultato (autovelox pi� vicino)
+ * */
 
 public class NavigationActivity extends Activity implements LocationListener{
 
-
+	private Location lastKnowLocation;
 	private LocationManager lm;
-	TextView txtInfo;
+	private TextView txtInfo;
+	private ArrayList<Autovelox> autoveloxes;
+	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_navigation);
 		txtInfo = (TextView) findViewById(R.id.txtInfo);
 		lm =(LocationManager) getSystemService(LOCATION_SERVICE);
+		
+		autoveloxes = new ArrayList<Autovelox>();
 	}
 
 	@Override
@@ -48,6 +75,7 @@ public class NavigationActivity extends Activity implements LocationListener{
 		return true;
 	}
 
+	
 	@Override
 	public void onLocationChanged(Location location) {
 		// TODO Auto-generated method stub
@@ -60,25 +88,42 @@ public class NavigationActivity extends Activity implements LocationListener{
 		// dobbiamo passare il controllo al metodo public float distanceTo (Location dest)
 		// in modo da calcolare precisamente la distanza e dunque mostrare a video tutte le info
 		
+		// Aggiorna l'ultima posizione
+		lastKnowLocation = new Location(location);
+		
 		txtInfo.setText("Latitude: " + location.getLatitude() + " Logitude: " + location.getLongitude());
-		Location autovelox = null;
+		Autovelox autovelox = null;
 		try {
-			autovelox = findAutovelox(location);
+			findAutovelox(location, "/sdcard/veloxdroid/Autovelox_Fissi.csv");
+			//findAutovelox(location, "/sdcard/veloxdroid/Autovelox_Fissi.csv");
+			autovelox = findNearestAutovelox(autoveloxes, location);
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		if(autovelox != null){
-			txtInfo.setText("distanza: " + autovelox.getSpeed());
+			txtInfo.setText("maxSpeed: " + autovelox.getMaxSpeed());
 		}
 	}
 
-	private Location findAutovelox(Location location) throws IOException{
+
+	/*
+	 * Bisogna togliere 0.035 dall'if che controlla la distanza ed inserire in una variabile di settings
+	 * */
+	private void findAutovelox(Location location, String path) throws IOException{
 		//creazione di un bufferedreader per file csv degli autovelox
-		BufferedReader br = new BufferedReader(new FileReader("/sdcard/veloxdroid/Autovelox_Fissi.csv"));
+		BufferedReader br = new BufferedReader(new FileReader(path));
 		String line;
-		//crea un arraylist di location per salvare tutti gli autovelox nel range predefinto
-		ArrayList<Location> locations = new ArrayList<Location>();
+		
+		Type type;
+		if (path.contains("Fissi"))
+			type = Type.FISSO;
+		else if (path.contains("Mobile"))
+			type = Type.MOBILE;
+		else
+			type = Type.ALTRO;
+			
+
 		//while per leggere dal bufferedreader 
 		while((line = br.readLine()) != null){
 
@@ -101,44 +146,50 @@ public class NavigationActivity extends Activity implements LocationListener{
 
 			//check dell'autovelox nel range - adesso hardcoded a 0.035 che sono 4km
 			if (Math.abs(longit - location.getLongitude()) < 0.035 && Math.abs(latit - location.getLatitude()) < 0.035) found = true;
-			long speed;
+			int speed;
 			//se l'autovelox è presente nel range
 			if (found == true ){
 				//crea un nuovo oggetto "location" e setta la sua latitudine/longitudine
-				Location autovelox = new Location("autov");
-				autovelox.setLatitude(latit);
-				autovelox.setLongitude(longit);				
+				Autovelox autovelox = new Autovelox();
+				autovelox.getLocation().setLatitude(latit);
+				autovelox.getLocation().setLongitude(longit);
+				autovelox.setType(type);
+				
 				//cerca il limite di velocità di tale autovelox - contenuto nell'altro stringtokenizer 
 				while (st2.hasMoreElements()) {
 					String nextElem = st2.nextElement().toString();
 					if (nextElem.contains("@")){
-						speed = Long.parseLong(nextElem.substring(nextElem.indexOf('@')+1));
+						speed = Integer.parseInt(nextElem.substring(nextElem.indexOf('@')+1));
 						//aggiungi il parametro di velocità all'autovelox
-						autovelox.setSpeed(speed);
+						autovelox.setMaxSpeed(speed);
 						break;
 					}				
 				}
 				//aggiunge l'autovelox alla collezione
-				locations.add(autovelox);
+				autoveloxes.add(autovelox);
 			}
 		}
 		br.close();
 		
+	}
+	
+	private Autovelox findNearestAutovelox(ArrayList<Autovelox> autoveloxes, Location location){
+
 		//ricerca l'autovelox più in prossimità tra quelli trovati rispetto alla location fornita 
 		//come parametro di chiamata del metodo
 		ArrayList<Float> distances = new ArrayList<Float>();
 		//se non ci sono autovelox trovati ritorna null
-		if(locations.size() == 0) return null;
+		if(autoveloxes.size() == 0) return null;
 		else{
-			for (Location l : locations){
+			for (Autovelox a : autoveloxes){
 				//per ogni location aggiungi la distanza fornita dal metodo distanceTo()
-				 distances.add(location.distanceTo(l));
+				distances.add(location.distanceTo(a.getLocation()));
 			}
 		}
 		//calcola l'indice dell'arraylist distances che ha valore minore - distanceTo() restituisce un float
 		int minIndex = distances.indexOf(Collections.min(distances));
-		//ritorna la location più prossima alla location attuale
-		return locations.get(minIndex);
+
+		return autoveloxes.get(minIndex);
 	}
 
 	@Override
@@ -159,6 +210,61 @@ public class NavigationActivity extends Activity implements LocationListener{
 	public void onStatusChanged(String provider, int status, Bundle extras) {
 		// TODO Auto-generated method stub
 
+	}
+	
+	public void doSendAutovelox(View view){
+		
+		Toast toast;
+		
+		
+		
+		if (lastKnowLocation != null){
+			toast = Toast.makeText(getApplicationContext(), "Uploaded: " + lastKnowLocation.getLatitude(), 10);
+			toast.show();
+			
+			double lat = lastKnowLocation.getLatitude();
+			double lon = lastKnowLocation.getLongitude();
+			StringEntity ent = null;
+			try {
+				ent = new StringEntity("latit=" + lat + "longit=" + lon);
+			} catch (UnsupportedEncodingException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
+			
+			HttpClient client = new DefaultHttpClient();
+			HttpPost post = new HttpPost("http://10.0.2.2:8080/VDServer/upload");
+			post.addHeader("content-type", "application/x-www-form-urlencoded");
+			post.setEntity(ent);
+
+			try {
+				HttpResponse response = client.execute(post);
+				HttpEntity responseEntity = response.getEntity();
+				String responseString = EntityUtils.toString(responseEntity);
+				System.out.println(responseString);
+				if (responseString.contains("OK")){
+					toast = Toast.makeText(getApplicationContext(), "Uploaded", 10);
+					toast.show();
+				}
+				else {
+					toast = Toast.makeText(getApplicationContext(), "Error", 10);
+					toast.show();
+				}
+			} catch (UnsupportedEncodingException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (ClientProtocolException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		} else {
+			toast = Toast.makeText(getApplicationContext(), "No location pixed", 10);
+			toast.show();
+		}
+		
 	}
 
 }
