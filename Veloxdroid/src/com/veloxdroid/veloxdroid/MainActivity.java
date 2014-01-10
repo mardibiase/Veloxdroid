@@ -72,6 +72,11 @@ public class MainActivity extends Activity {
 			toast.show();
 			// record the fact that the app has been started at least once
 			settings.edit().putBoolean("first_time", false).commit();
+		}else{
+			Toast toast = Toast.makeText(getApplicationContext(), "Bentornato in Veloxdroid", 5);
+			toast.show();
+			Intent intent = new  Intent(this, NavigationActivity.class);
+			startActivity(intent);
 		}
 	}
 

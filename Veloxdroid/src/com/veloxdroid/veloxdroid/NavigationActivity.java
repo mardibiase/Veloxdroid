@@ -75,7 +75,7 @@ public class NavigationActivity extends Activity implements LocationListener{
 
 	private Location findAutovelox(Location location) throws IOException{
 		//creazione di un bufferedreader per file csv degli autovelox
-		BufferedReader br = new BufferedReader(new FileReader("/sdcard/veloxdroid/"));
+		BufferedReader br = new BufferedReader(new FileReader("/sdcard/veloxdroid/Autovelox_Fissi.csv"));
 		String line;
 		//crea un arraylist di location per salvare tutti gli autovelox nel range predefinto
 		ArrayList<Location> locations = new ArrayList<Location>();

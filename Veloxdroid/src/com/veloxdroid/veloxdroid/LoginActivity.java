@@ -211,6 +211,8 @@ public class LoginActivity extends Activity {
 	public class UserLoginTask extends AsyncTask<Void, Void, Boolean> {
 		@Override
 		protected Boolean doInBackground(Void... params) {
+			
+			
 			String base64_MD5_password = null;
 			try {
 				MessageDigest digester = MessageDigest.getInstance("MD5");
@@ -258,7 +260,7 @@ public class LoginActivity extends Activity {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
-			return toReturn;
+		return toReturn;
 		}
 
 		@Override
