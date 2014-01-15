@@ -72,7 +72,7 @@ public class DownloadTask extends AsyncTask<String, Integer, String> {
                     folder.mkdir();
                 }	              
                 
-                output = new FileOutputStream(folder.getAbsolutePath().toString() + "/temp.html");
+                output = new FileOutputStream(folder.getAbsolutePath().toString() + "/Autovelox_Fissi.csv");
 
                 byte data[] = new byte[4096];
                 long total = 0;

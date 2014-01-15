@@ -8,7 +8,6 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.StringTokenizer;
 
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
@@ -20,19 +19,20 @@ import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.util.EntityUtils;
 
 import com.veloxdroid.beans.Autovelox;
-import com.veloxdroid.beans.Autovelox.Type;
+import com.veloxdroid.utils.SearcherAutovelox;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
-import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.util.Base64;
+import android.os.Vibrator;
 import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -51,6 +51,11 @@ public class NavigationActivity extends Activity implements LocationListener{
 	private LocationManager lm;
 	private TextView txtInfo;
 	private ArrayList<Autovelox> autoveloxes;
+	long distance;
+	private boolean sounds, vibration;
+	private Vibrator vibrator;
+	private View myView;
+	
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -60,6 +65,14 @@ public class NavigationActivity extends Activity implements LocationListener{
 		lm =(LocationManager) getSystemService(LOCATION_SERVICE);
 
 		autoveloxes = new ArrayList<Autovelox>();
+		
+		final SharedPreferences settings = getSharedPreferences(MainActivity.PREFS_NAME, 0);
+		distance = settings.getInt("distance", 4000);
+		sounds = settings.getBoolean("sounds", true);
+		vibration = settings.getBoolean("vibration", true);
+		
+		vibrator = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
+		this.myView = findViewById(R.layout.activity_navigation);
 	}
 
 	@Override
@@ -96,108 +109,13 @@ public class NavigationActivity extends Activity implements LocationListener{
 
 		// Aggiorna l'ultima posizione
 		lastKnowLocation = new Location(location);
+		
+		SearcherAutovelox sa = new SearcherAutovelox(autoveloxes, txtInfo, distance, sounds, vibration, myView ,vibrator);
+		sa.execute(location);
 
 		txtInfo.setText("Latitude: " + location.getLatitude() + " Logitude: " + location.getLongitude());
-		Autovelox autovelox = null;
-		try {
-			findAutovelox(location, "/sdcard/veloxdroid/Autovelox_Fissi.csv");
-			//findAutovelox(location, "/sdcard/veloxdroid/Autovelox_Fissi.csv");
-			autovelox = findNearestAutovelox(autoveloxes, location);
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		if(autovelox != null){
-			txtInfo.setText("maxSpeed: " + autovelox.getMaxSpeed());
-		}
 	}
-
-
-	/*
-	 * Bisogna togliere 0.035 dall'if che controlla la distanza ed inserire in una variabile di settings
-	 * */
-	private void findAutovelox(Location location, String path) throws IOException{
-		//creazione di un bufferedreader per file csv degli autovelox
-		BufferedReader br = new BufferedReader(new FileReader(path));
-		String line;
-
-		Type type;
-		if (path.contains("Fissi"))
-			type = Type.FISSO;
-		else if (path.contains("Mobile"))
-			type = Type.MOBILE;
-		else
-			type = Type.ALTRO;
-
-
-		//while per leggere dal bufferedreader 
-		while((line = br.readLine()) != null){
-
-			StringTokenizer st2 = new StringTokenizer(line, " ");
-			// il primo token contenente lat-long-altro dato
-			String first = st2.nextToken(); 
-			//creo uno stringtokenizer diverso che ha come parametro la virgola
-			StringTokenizer st3 = new StringTokenizer(first, ",");
-			Double longit = null;
-			Double latit = null;
-			Boolean found = false;
-			if (st3.hasMoreElements()){
-				//il primo token di st3 è la longitudine
-				longit = Double.parseDouble(st3.nextToken());	
-			}
-			if (st3.hasMoreElements()){
-				//il secondo token è la latitudine
-				latit = Double.parseDouble(st3.nextToken());	
-			}
-
-			//check dell'autovelox nel range - adesso hardcoded a 0.035 che sono 4km
-			if (Math.abs(longit - location.getLongitude()) < 0.035 && Math.abs(latit - location.getLatitude()) < 0.035) found = true;
-			int speed;
-			//se l'autovelox è presente nel range
-			if (found == true ){
-				//crea un nuovo oggetto "location" e setta la sua latitudine/longitudine
-				Autovelox autovelox = new Autovelox();
-				autovelox.getLocation().setLatitude(latit);
-				autovelox.getLocation().setLongitude(longit);
-				autovelox.setType(type);
-
-				//cerca il limite di velocità di tale autovelox - contenuto nell'altro stringtokenizer 
-				while (st2.hasMoreElements()) {
-					String nextElem = st2.nextElement().toString();
-					if (nextElem.contains("@")){
-						speed = Integer.parseInt(nextElem.substring(nextElem.indexOf('@')+1));
-						//aggiungi il parametro di velocità all'autovelox
-						autovelox.setMaxSpeed(speed);
-						break;
-					}				
-				}
-				//aggiunge l'autovelox alla collezione
-				autoveloxes.add(autovelox);
-			}
-		}
-		br.close();
-
-	}
-
-	private Autovelox findNearestAutovelox(ArrayList<Autovelox> autoveloxes, Location location){
-
-		//ricerca l'autovelox più in prossimità tra quelli trovati rispetto alla location fornita 
-		//come parametro di chiamata del metodo
-		ArrayList<Float> distances = new ArrayList<Float>();
-		//se non ci sono autovelox trovati ritorna null
-		if(autoveloxes.size() == 0) return null;
-		else{
-			for (Autovelox a : autoveloxes){
-				//per ogni location aggiungi la distanza fornita dal metodo distanceTo()
-				distances.add(location.distanceTo(a.getLocation()));
-			}
-		}
-		//calcola l'indice dell'arraylist distances che ha valore minore - distanceTo() restituisce un float
-		int minIndex = distances.indexOf(Collections.min(distances));
-
-		return autoveloxes.get(minIndex);
-	}
-
+	
 	@Override
 	public void onProviderDisabled(String provider) {
 		// TODO Auto-generated method stub
@@ -282,6 +200,20 @@ public class NavigationActivity extends Activity implements LocationListener{
 		UploadTask task = new UploadTask();
 		task.execute();
 
+	}
+	
+	@Override
+	public boolean onOptionsItemSelected(MenuItem item){
+		
+		switch(item.getItemId()){
+		case R.id.action_settings:
+			Intent intent = new Intent(this, SettingsActivity.class);
+			startActivity(intent);
+			return true;
+			default:
+				return super.onOptionsItemSelected(item);
+		}
+		
 	}
 
 }

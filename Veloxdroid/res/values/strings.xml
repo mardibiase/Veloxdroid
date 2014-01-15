@@ -3,7 +3,12 @@
 
     <string name="app_name">Veloxdroid</string>
     <string name="action_settings">Settings</string>
-    <string name="hello_world">Hello world!</string>
+    <string name="account_email">example@gmail.com</string>
+    <string name="title_account_email">Account EMail</string>
+    <string name="notify_options">Notify options</string>
+    <string name="text_set_distance">Set notification distance</string>
+    <string name="cb_sounds">Sounds</string>
+    <string name="cb_vibration">Vibration</string>
     <string name="downloadFile_button">Download file dei dati</string>
     <string name="title_activity_download_file">DownloadFileActivity</string>
     <string name="title_activity_download">DownloadActivity</string>
@@ -12,5 +17,6 @@
     <string name="button_register">Register</string>
     <string name="button_send_autovelox">Send Autovelox</string>
     <string name="title_activity_navigation">NavigationActivity</string>
+    <string name="title_activity_settings">SettingsActivity</string>
 
 </resources>
