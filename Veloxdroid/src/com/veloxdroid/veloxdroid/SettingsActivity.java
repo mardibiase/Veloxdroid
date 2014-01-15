@@ -1,16 +1,22 @@
 package com.veloxdroid.veloxdroid;
 
+import org.apache.http.impl.conn.ProxySelectorRoutePlanner;
+
 import android.os.Bundle;
 import android.app.Activity;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
 import android.view.Menu;
+import android.view.View;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.CompoundButton.OnCheckedChangeListener;
 import android.widget.EditText;
+import android.widget.SeekBar;
+import android.widget.SeekBar.OnSeekBarChangeListener;
 import android.widget.TextView;
 
 public class SettingsActivity extends Activity {
@@ -30,6 +36,27 @@ public class SettingsActivity extends Activity {
 		
 		CheckBox cb_vibration = (CheckBox)findViewById(R.id.checkBoxVibration);
 		cb_vibration.setChecked(settings.getBoolean("vibration", true));
+		SeekBar sb_vibration = (SeekBar)findViewById(R.id.seekBarVibrationDuration);
+		sb_vibration.setEnabled(settings.getBoolean("vibration", true));
+		sb_vibration.setProgress(settings.getInt("seek_vibration", 500));
+		sb_vibration.setMax(1000);
+		sb_vibration.setOnSeekBarChangeListener(new OnSeekBarChangeListener() {
+			
+			@Override
+			public void onStopTrackingTouch(SeekBar seekBar) {
+			}
+			
+			@Override
+			public void onStartTrackingTouch(SeekBar seekBar) {
+			}
+			
+			@Override
+			public void onProgressChanged(SeekBar seekBar, int progress,
+					boolean fromUser) {
+				Log.d ("SeekBar", ""+progress);
+				settings.edit().putInt("seek_vibration", progress).commit();
+			}
+		});
 		
 		EditText et_distance = (EditText)findViewById(R.id.editTextSetDistance);
 		et_distance.setText(String.valueOf(settings.getInt("distance", 4000)), TextView.BufferType.EDITABLE);
@@ -45,6 +72,7 @@ public class SettingsActivity extends Activity {
 			@Override
 			public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
 				settings.edit().putBoolean("vibration", isChecked).commit();
+				findViewById(R.id.seekBarVibrationDuration).setEnabled(isChecked);
 			}
 		});
 		
@@ -79,6 +107,9 @@ public class SettingsActivity extends Activity {
 		getMenuInflater().inflate(R.menu.settings, menu);
 		return true;
 	}
+	
+	
+
 
 	
 	

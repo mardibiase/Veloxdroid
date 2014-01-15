@@ -31,6 +31,7 @@ import android.location.LocationManager;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Vibrator;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -55,7 +56,7 @@ public class NavigationActivity extends Activity implements LocationListener{
 	private boolean sounds, vibration;
 	private Vibrator vibrator;
 	private View myView;
-	
+ 
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -199,6 +200,18 @@ public class NavigationActivity extends Activity implements LocationListener{
 	public void doSendAutovelox(View view){
 		UploadTask task = new UploadTask();
 		task.execute();
+
+	}
+	
+	public void doVibration(View view){
+
+		final SharedPreferences settings = getSharedPreferences(MainActivity.PREFS_NAME, 0);
+		// Vibrate only if the checkbos is enabled
+		if (settings.getBoolean("vibration", true)){
+			Vibrator vibrator = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
+			// Get the user choose on duration of vibration
+			vibrator.vibrate(settings.getInt("seek_vibration", 500));
+		}
 
 	}
 	

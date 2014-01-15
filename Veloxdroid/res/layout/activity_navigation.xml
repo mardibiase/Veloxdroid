@@ -27,4 +27,14 @@
         android:text="@string/button_send_autovelox"
         android:onClick="doSendAutovelox" />
 
+    <Button
+        android:id="@+id/button1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignBottom="@+id/txtInfo"
+        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="48dp"
+        android:text="Vibration"
+        android:onClick="doVibration" />
+
 </RelativeLayout>

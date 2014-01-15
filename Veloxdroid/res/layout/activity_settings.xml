@@ -73,4 +73,22 @@
         android:text="@string/text_set_distance"
         android:textAppearance="?android:attr/textAppearanceLarge" />
 
+    <TextView
+        android:id="@+id/textVibrationDuration"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@+id/textViewTitleNotifyOptions"
+        android:layout_below="@+id/editTextSetDistance"
+        android:layout_marginTop="17dp"
+        android:text="@string/vibration_duration"
+        android:textAppearance="?android:attr/textAppearanceLarge" />
+
+    <SeekBar
+        android:id="@+id/seekBarVibrationDuration"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@+id/editTextSetDistance"
+        android:layout_below="@+id/textVibrationDuration"
+        android:enabled="false" />
+
 </RelativeLayout>

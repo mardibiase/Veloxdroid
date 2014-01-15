@@ -7,6 +7,7 @@
     <string name="title_account_email">Account EMail</string>
     <string name="notify_options">Notify options</string>
     <string name="text_set_distance">Set notification distance</string>
+    <string name="vibration_duration">Vibration duration</string>
     <string name="cb_sounds">Sounds</string>
     <string name="cb_vibration">Vibration</string>
     <string name="downloadFile_button">Download file dei dati</string>
