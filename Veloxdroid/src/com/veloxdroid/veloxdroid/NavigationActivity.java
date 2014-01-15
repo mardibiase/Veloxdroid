@@ -35,18 +35,18 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
-
 
 /*
  * To Do:
  * 
  * Aggiungere la gestione degli autovelox mobili (secondo file)
- * Ricerca dei fissi e dei mobili al fine di ottenere un unico risultato (autovelox pi� vicino)
+ * Ricerca dei fissi e dei mobili al fine di ottenere un unico risultato (autovelox piu' vicino)
  * */
 
-public class NavigationActivity extends Activity implements LocationListener{
+public class NavigationActivity extends Activity implements LocationListener {
 
 	private Location lastKnowLocation;
 	private LocationManager lm;
@@ -56,34 +56,36 @@ public class NavigationActivity extends Activity implements LocationListener{
 	private boolean sounds, vibration;
 	private Vibrator vibrator;
 	private View myView;
- 
+	private Button btn_feedback, btn_delete;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_navigation);
 		txtInfo = (TextView) findViewById(R.id.txtInfo);
-		lm =(LocationManager) getSystemService(LOCATION_SERVICE);
+		lm = (LocationManager) getSystemService(LOCATION_SERVICE);
 
 		autoveloxes = new ArrayList<Autovelox>();
-		
+
 		final SharedPreferences settings = getSharedPreferences(MainActivity.PREFS_NAME, 0);
 		distance = settings.getInt("distance", 4000);
 		sounds = settings.getBoolean("sounds", true);
 		vibration = settings.getBoolean("vibration", true);
-		
+
 		vibrator = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
+		btn_feedback = (Button) findViewById(R.id.btn_feedback);
+		btn_delete = (Button) findViewById(R.id.btn_deleteAutovelox);
 		this.myView = findViewById(R.layout.activity_navigation);
 	}
 
 	@Override
-	protected void onResume(){
+	protected void onResume() {
 		lm.requestLocationUpdates(LocationManager.GPS_PROVIDER, 1000, 10f, this);
 		super.onResume();
 	}
 
 	@Override
-	protected void onPause(){
+	protected void onPause() {
 		lm.removeUpdates(this);
 		super.onPause();
 	}
@@ -95,28 +97,28 @@ public class NavigationActivity extends Activity implements LocationListener{
 		return true;
 	}
 
-
 	@Override
 	public void onLocationChanged(Location location) {
 		// TODO Auto-generated method stub
-		//4km è 0.035 di distanza in double usando latitudine e logitudine		
-		//		5 decimali
-		//		0.03500 = 4km -> 3 decimali
-		//		ipotizza 1km =  0,00875
-		//		dunque 875 x 4  = 3500 cicli
-		// ipotizzando che venga rilevato un autovelox dentro il range prefissato, 
+		// 4km è 0.035 di distanza in double usando latitudine e logitudine
+		// 5 decimali
+		// 0.03500 = 4km -> 3 decimali
+		// ipotizza 1km = 0,00875
+		// dunque 875 x 4 = 3500 cicli
+		// ipotizzando che venga rilevato un autovelox dentro il range prefissato,
 		// dobbiamo passare il controllo al metodo public float distanceTo (Location dest)
 		// in modo da calcolare precisamente la distanza e dunque mostrare a video tutte le info
 
 		// Aggiorna l'ultima posizione
 		lastKnowLocation = new Location(location);
-		
-		SearcherAutovelox sa = new SearcherAutovelox(autoveloxes, txtInfo, distance, sounds, vibration, myView ,vibrator);
+
+		SearcherAutovelox sa = new SearcherAutovelox(autoveloxes, txtInfo, btn_feedback, btn_delete, distance,
+				getSharedPreferences(MainActivity.PREFS_NAME, 0), getApplicationContext());
 		sa.execute(location);
 
 		txtInfo.setText("Latitude: " + location.getLatitude() + " Logitude: " + location.getLongitude());
 	}
-	
+
 	@Override
 	public void onProviderDisabled(String provider) {
 		// TODO Auto-generated method stub
@@ -137,15 +139,13 @@ public class NavigationActivity extends Activity implements LocationListener{
 
 	}
 
-	/**
-	 * Represents an asynchronous upload task used to send the Autovelox
-	 */
+	// Represents an asynchronous upload task used to send the Autovelox
 	public class UploadTask extends AsyncTask<Void, Void, Boolean> {
 		@Override
 		protected Boolean doInBackground(Void... params) {
-			Toast toast;		
+			Toast toast;
 
-			if (lastKnowLocation != null){
+			if (lastKnowLocation != null) {
 
 				double lat = lastKnowLocation.getLatitude();
 				double lon = lastKnowLocation.getLongitude();
@@ -167,11 +167,10 @@ public class NavigationActivity extends Activity implements LocationListener{
 					HttpEntity responseEntity = response.getEntity();
 					String responseString = EntityUtils.toString(responseEntity);
 					System.out.println(responseString);
-					if (responseString.contains("OK")){
+					if (responseString.contains("OK")) {
 						toast = Toast.makeText(getApplicationContext(), "Uploaded", 10);
 						toast.show();
-					}
-					else {
+					} else {
 						toast = Toast.makeText(getApplicationContext(), "Error", 10);
 						toast.show();
 					}
@@ -184,7 +183,7 @@ public class NavigationActivity extends Activity implements LocationListener{
 				} catch (IOException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
-				}	catch (Exception e){
+				} catch (Exception e) {
 					e.printStackTrace();
 				}
 
@@ -192,41 +191,54 @@ public class NavigationActivity extends Activity implements LocationListener{
 				toast = Toast.makeText(getApplicationContext(), "No location pixed", 10);
 				toast.show();
 			}
-			return true;			
+			return true;
 		}
 
 	}
 
-	public void doSendAutovelox(View view){
+	//listener for the send Autvelox button
+	private void doSendAutovelox(View view) {
 		UploadTask task = new UploadTask();
 		task.execute();
-
 	}
 	
-	public void doVibration(View view){
+	//listener for the sendFeedback button 
+	private void doSendFeedback(View view){
+		/********************
+		 * // TODO - completare l'implementazione del metodo
+		 ********************/
+	}
+
+	//listener for the delete button 
+	private void doDeleteAutovelox(View view){
+		/********************
+		 * // TODO - completare l'implementazione del metodo
+		 ********************/
+	}
+	
+	//listener for the vibration event
+	public void doVibration(View view) {
 
 		final SharedPreferences settings = getSharedPreferences(MainActivity.PREFS_NAME, 0);
 		// Vibrate only if the checkbos is enabled
-		if (settings.getBoolean("vibration", true)){
+		if (settings.getBoolean("vibration", true)) {
 			Vibrator vibrator = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
 			// Get the user choose on duration of vibration
 			vibrator.vibrate(settings.getInt("seek_vibration", 500));
 		}
-
 	}
-	
+
+	//listener for the settings menu on the top right corner
 	@Override
-	public boolean onOptionsItemSelected(MenuItem item){
-		
-		switch(item.getItemId()){
+	public boolean onOptionsItemSelected(MenuItem item) {
+		switch (item.getItemId()) {
 		case R.id.action_settings:
 			Intent intent = new Intent(this, SettingsActivity.class);
 			startActivity(intent);
 			return true;
-			default:
-				return super.onOptionsItemSelected(item);
+		default:
+			return super.onOptionsItemSelected(item);
 		}
-		
 	}
 
 }

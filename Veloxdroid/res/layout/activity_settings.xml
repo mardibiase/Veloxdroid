@@ -91,4 +91,13 @@
         android:layout_below="@+id/textVibrationDuration"
         android:enabled="false" />
 
+    <Switch
+        android:id="@+id/switchAutoSynch"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@+id/textVibrationDuration"
+        android:layout_below="@+id/seekBarVibrationDuration"
+        android:layout_marginTop="20dp"
+        android:text="@string/switch_auto_synch" />
+
 </RelativeLayout>

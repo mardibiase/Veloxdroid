@@ -7,14 +7,16 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.StringTokenizer;
 
-import android.R.bool;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.location.Location;
+import android.media.Ringtone;
+import android.media.RingtoneManager;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Vibrator;
-import android.view.SoundEffectConstants;
 import android.view.View;
+import android.widget.Button;
 import android.widget.TextView;
 
 import com.veloxdroid.beans.Autovelox;
@@ -30,24 +32,26 @@ public class SearcherAutovelox extends AsyncTask<Location, Integer, String> {
 	private boolean sounds, vibration;
 	private View view;
 	private Vibrator vibrator;
-	
-	public SearcherAutovelox(ArrayList<Autovelox> autoveloxes, TextView txtInfo, long distance, boolean sounds, boolean vibration, View view, Vibrator vibrator) {
+	private SharedPreferences settings;
+	private Context context;
+	private Button btn_delete, btn_feedback;
+
+	public SearcherAutovelox(ArrayList<Autovelox> autoveloxes, TextView txtInfo, Button btn_feedback, Button btn_delete, long distance,
+			SharedPreferences settings, Context context) {
 		this.autoveloxes = autoveloxes;
 		this.txtInfo = txtInfo;
-		
-		// Why 30.9 meters is 1 seconds in degrees
-		distanceInDegrees = (float) ((float)distance / 30.9 / 60.0 / 60.0) ;
-		
-		this.sounds = sounds;
-		this.vibration = vibration;
-		this.view = view;
-		this.vibrator = vibrator;
+		this.btn_delete = btn_delete;
+		this.btn_feedback = btn_feedback;
+
+		// Because 30.9 meters is 1 seconds in degrees
+		distanceInDegrees = (float) ((float) distance / 30.9 / 60.0 / 60.0);
+
+		this.settings = settings;
+		this.context = context;
 	}
-	/*
-	 * Bisogna togliere 0.035 dall'if che controlla la distanza ed inserire in una variabile di settings
-	 * */
-	private void findAutovelox(Location location, String path) throws IOException{
-		//creazione di un bufferedreader per file csv degli autovelox
+
+	private void findAutovelox(Location location, String path) throws IOException {
+		// creazione di un bufferedreader per file csv degli autovelox
 		BufferedReader br = new BufferedReader(new FileReader(path));
 		String line;
 
@@ -59,49 +63,49 @@ public class SearcherAutovelox extends AsyncTask<Location, Integer, String> {
 		else
 			type = Type.ALTRO;
 
-
-		//while per leggere dal bufferedreader 
-		while((line = br.readLine()) != null){
+		// while per leggere dal bufferedreader
+		while ((line = br.readLine()) != null) {
 
 			StringTokenizer st2 = new StringTokenizer(line, " ");
 			// il primo token contenente lat-long-altro dato
-			String first = st2.nextToken(); 
-			//creo uno stringtokenizer diverso che ha come parametro la virgola
+			String first = st2.nextToken();
+			// creo uno stringtokenizer diverso che ha come parametro la virgola
 			StringTokenizer st3 = new StringTokenizer(first, ",");
 			Double longit = null;
 			Double latit = null;
 			Boolean found = false;
-			if (st3.hasMoreElements()){
-				//il primo token di st3 Ã¨ la longitudine
-				longit = Double.parseDouble(st3.nextToken());	
+			if (st3.hasMoreElements()) {
+				// il primo token di st3 è la longitudine
+				longit = Double.parseDouble(st3.nextToken());
 			}
-			if (st3.hasMoreElements()){
-				//il secondo token Ã¨ la latitudine
-				latit = Double.parseDouble(st3.nextToken());	
+			if (st3.hasMoreElements()) {
+				// il secondo token è la latitudine
+				latit = Double.parseDouble(st3.nextToken());
 			}
 
-			//check dell'autovelox nel range - adesso hardcoded a 0.035 che sono 4km
-			if (Math.abs(longit - location.getLongitude()) < distanceInDegrees && Math.abs(latit - location.getLatitude()) < distanceInDegrees) found = true;
+			// check dell'autovelox nel range - adesso va bene perchè abbiamo messo questo valore in distanceInDegrees
+			if (Math.abs(longit - location.getLongitude()) < distanceInDegrees && Math.abs(latit - location.getLatitude()) < distanceInDegrees)
+				found = true;
 			int speed;
-			//se l'autovelox Ã¨ presente nel range
-			if (found == true ){
-				//crea un nuovo oggetto "location" e setta la sua latitudine/longitudine
+			// se l'autovelox è presente nel range
+			if (found == true) {
+				// crea un nuovo oggetto Autovelox e setta la sua latitudine/longitudine
 				Autovelox autovelox = new Autovelox();
 				autovelox.getLocation().setLatitude(latit);
 				autovelox.getLocation().setLongitude(longit);
 				autovelox.setType(type);
 
-				//cerca il limite di velocitÃ  di tale autovelox - contenuto nell'altro stringtokenizer 
+				// cerca il limite di velocità di tale autovelox - contenuto nell'altro stringtokenizer
 				while (st2.hasMoreElements()) {
 					String nextElem = st2.nextElement().toString();
-					if (nextElem.contains("@")){
-						speed = Integer.parseInt(nextElem.substring(nextElem.indexOf('@')+1));
-						//aggiungi il parametro di velocitÃ  all'autovelox
+					if (nextElem.contains("@")) {
+						speed = Integer.parseInt(nextElem.substring(nextElem.indexOf('@') + 1));
+						// aggiungi il parametro di velocità all'autovelox
 						autovelox.setMaxSpeed(speed);
 						break;
-					}				
+					}
 				}
-				//aggiunge l'autovelox alla collezione
+				// aggiunge l'autovelox alla collezione
 				autoveloxes.add(autovelox);
 			}
 		}
@@ -109,20 +113,24 @@ public class SearcherAutovelox extends AsyncTask<Location, Integer, String> {
 
 	}
 
-	private Autovelox findNearestAutovelox(ArrayList<Autovelox> autoveloxes, Location location){
+	private Autovelox findNearestAutovelox(ArrayList<Autovelox> autoveloxes, Location location) {
 
-		//ricerca l'autovelox piÃ¹ in prossimitÃ  tra quelli trovati rispetto alla location fornita 
-		//come parametro di chiamata del metodo
+		// ricerca l'autovelox più in prossimità tra quelli trovati rispetto
+		// alla location fornita
+		// come parametro di chiamata del metodo
 		ArrayList<Float> distances = new ArrayList<Float>();
-		//se non ci sono autovelox trovati ritorna null
-		if(autoveloxes.size() == 0) return null;
-		else{
-			for (Autovelox a : autoveloxes){
-				//per ogni location aggiungi la distanza fornita dal metodo distanceTo()
+		// se non ci sono autovelox trovati ritorna null
+		if (autoveloxes.size() == 0)
+			return null;
+		else {
+			for (Autovelox a : autoveloxes) {
+				// per ogni location aggiungi la distanza fornita dal metodo
+				// distanceTo()
 				distances.add(location.distanceTo(a.getLocation()));
 			}
 		}
-		//calcola l'indice dell'arraylist distances che ha valore minore - distanceTo() restituisce un float
+		// calcola l'indice dell'arraylist distances che ha valore minore -
+		// distanceTo() restituisce un float
 		int minIndex = distances.indexOf(Collections.min(distances));
 
 		return autoveloxes.get(minIndex);
@@ -130,34 +138,49 @@ public class SearcherAutovelox extends AsyncTask<Location, Integer, String> {
 
 	@Override
 	protected String doInBackground(Location... params) {
-		
+
 		try {
-			findAutovelox(params[0], "/sdcard/veloxdroid/Autovelox_Fissi.csv");
-			
+			findAutovelox(params[0], MainActivity.avFissi_fileName);
 			autovelox = findNearestAutovelox(autoveloxes, params[0]);
-			
-			if(autovelox != null){
+
+			if (autovelox != null) {
 				txtInfo.setText("maxSpeed: " + autovelox.getMaxSpeed());
+				btn_delete.setVisibility(View.VISIBLE);
+				btn_feedback.setVisibility(View.VISIBLE);
 			}
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		
+
 		return null;
 	}
-	
-    @Override
-    protected void onPostExecute(String result) {
-        
-		if(autovelox != null){
+
+	@Override
+	protected void onPostExecute(String result) {
+
+		if (autovelox != null) {
 			txtInfo.setText("maxSpeed: " + autovelox.getMaxSpeed());
-			if (sounds)
-				view.playSoundEffect(SoundEffectConstants.CLICK);
-			if (vibration)
-				vibrator.vibrate(1000);
+			notifyAutovelox();
 		} else {
 			txtInfo.setText("Autovelox non trovato");
 		}
-    }
+	}
+
+	private void notifyAutovelox() {
+
+		if (settings.getBoolean("sounds", true)) {
+			Uri notification = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
+			Ringtone r = RingtoneManager.getRingtone(context, notification);
+			r.play();
+			r.play();
+		}
+
+		// Vibrate only if the checkbos is enabled
+		if (settings.getBoolean("vibration", true)) {
+			Vibrator vibrator = (Vibrator) context.getSystemService(Context.VIBRATOR_SERVICE);
+			// Get the user choose on duration of vibration
+			vibrator.vibrate(settings.getInt("seek_vibration", 500));
+		}
+	}
 }

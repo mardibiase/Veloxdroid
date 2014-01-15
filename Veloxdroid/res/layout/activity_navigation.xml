@@ -28,13 +28,24 @@
         android:onClick="doSendAutovelox" />
 
     <Button
-        android:id="@+id/button1"
+        android:id="@+id/btn_feedback"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignBottom="@+id/txtInfo"
-        android:layout_centerHorizontal="true"
-        android:layout_marginBottom="48dp"
-        android:text="Vibration"
-        android:onClick="doVibration" />
+        android:layout_alignTop="@+id/send_autovelox"
+        android:layout_marginTop="67dp"
+        android:text="@string/btn_feedback"
+        android:visibility="gone" 
+        android:onClick="doSendFeedback"/>
+
+    <Button
+        android:id="@+id/btn_deleteAutovelox"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignBottom="@+id/btn_feedback"
+        android:layout_marginLeft="28dp"
+        android:layout_toRightOf="@+id/txtInfo"
+        android:text="@string/btn_deleteAutovelox"
+        android:visibility="gone" 
+        android:onClick="doDeleteAutovelox"/>
 
 </RelativeLayout>

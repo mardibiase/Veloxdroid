@@ -19,5 +19,7 @@
     <string name="button_send_autovelox">Send Autovelox</string>
     <string name="title_activity_navigation">NavigationActivity</string>
     <string name="title_activity_settings">SettingsActivity</string>
-
+ 	<string name="switch_auto_synch">Auto Synch</string>
+ 	<string name="btn_feedback">Feedback</string>
+ 	<string name="btn_deleteAutovelox">Delete</string>
 </resources>

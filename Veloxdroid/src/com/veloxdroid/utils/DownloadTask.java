@@ -7,6 +7,9 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
+
+import com.veloxdroid.veloxdroid.MainActivity;
+
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.os.AsyncTask;
@@ -16,7 +19,6 @@ import android.widget.Toast;
 
 /*
  * To Do: 
- * Parametrizzare del path del file
  * Prevedere il download multiplo dei file (fissi e mobili)
  * Prevedere l'eccezione sul server
  * */
@@ -67,12 +69,16 @@ public class DownloadTask extends AsyncTask<String, Integer, String> {
                 // download the file
                 input = connection.getInputStream();
                 
-                File folder = new File(Environment.getExternalStorageDirectory() + "/veloxdroid");
+                //modifica marco - proviamo ad usare la variabile statica della MainActivity
+                //File folder = new File(Environment.getExternalStorageDirectory() + "/veloxdroid");
+                File folder = new File(MainActivity.veloxdroid_sdcard_path);
                 if (!folder.exists()) {
                     folder.mkdir();
                 }	              
                 
-                output = new FileOutputStream(folder.getAbsolutePath().toString() + "/Autovelox_Fissi.csv");
+                //modifica marco - proviamo ad usare la variabile statica della MainActivity
+                //output = new FileOutputStream(folder.getAbsolutePath().toString() + "/Autovelox_Fissi.csv");
+                output = new FileOutputStream(MainActivity.avFissi_fileName);
 
                 byte data[] = new byte[4096];
                 long total = 0;

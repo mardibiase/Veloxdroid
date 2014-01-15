@@ -1,22 +1,22 @@
 package com.veloxdroid.veloxdroid;
 
-import org.apache.http.impl.conn.ProxySelectorRoutePlanner;
-
 import android.os.Bundle;
+
 import android.app.Activity;
-import android.content.Intent;
+
 import android.content.SharedPreferences;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
 import android.view.Menu;
-import android.view.View;
+
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.CompoundButton.OnCheckedChangeListener;
 import android.widget.EditText;
 import android.widget.SeekBar;
 import android.widget.SeekBar.OnSeekBarChangeListener;
+import android.widget.Switch;
 import android.widget.TextView;
 
 public class SettingsActivity extends Activity {
@@ -25,49 +25,48 @@ public class SettingsActivity extends Activity {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_settings);
-		
+
 		final SharedPreferences settings = getSharedPreferences(MainActivity.PREFS_NAME, 0);
-		
-		TextView tv_accountEmail = (TextView)findViewById(R.id.textViewAccountEmail);
+
+		TextView tv_accountEmail = (TextView) findViewById(R.id.textViewAccountEmail);
 		tv_accountEmail.setText(settings.getString("eMail", "Visitatore"));
-		
-		CheckBox cb_sounds = (CheckBox)findViewById(R.id.checkBoxSounds);
+
+		CheckBox cb_sounds = (CheckBox) findViewById(R.id.checkBoxSounds);
 		cb_sounds.setChecked(settings.getBoolean("sounds", true));
-		
-		CheckBox cb_vibration = (CheckBox)findViewById(R.id.checkBoxVibration);
+
+		CheckBox cb_vibration = (CheckBox) findViewById(R.id.checkBoxVibration);
 		cb_vibration.setChecked(settings.getBoolean("vibration", true));
-		SeekBar sb_vibration = (SeekBar)findViewById(R.id.seekBarVibrationDuration);
+		SeekBar sb_vibration = (SeekBar) findViewById(R.id.seekBarVibrationDuration);
 		sb_vibration.setEnabled(settings.getBoolean("vibration", true));
 		sb_vibration.setProgress(settings.getInt("seek_vibration", 500));
 		sb_vibration.setMax(1000);
 		sb_vibration.setOnSeekBarChangeListener(new OnSeekBarChangeListener() {
-			
+
 			@Override
 			public void onStopTrackingTouch(SeekBar seekBar) {
 			}
-			
+
 			@Override
 			public void onStartTrackingTouch(SeekBar seekBar) {
 			}
-			
+
 			@Override
-			public void onProgressChanged(SeekBar seekBar, int progress,
-					boolean fromUser) {
-				Log.d ("SeekBar", ""+progress);
+			public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+				Log.d("SeekBar", "" + progress);
 				settings.edit().putInt("seek_vibration", progress).commit();
 			}
 		});
-		
-		EditText et_distance = (EditText)findViewById(R.id.editTextSetDistance);
+
+		EditText et_distance = (EditText) findViewById(R.id.editTextSetDistance);
 		et_distance.setText(String.valueOf(settings.getInt("distance", 4000)), TextView.BufferType.EDITABLE);
-	
+
 		cb_sounds.setOnCheckedChangeListener(new OnCheckedChangeListener() {
 			@Override
 			public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
 				settings.edit().putBoolean("sounds", isChecked).commit();
 			}
 		});
-		
+
 		cb_vibration.setOnCheckedChangeListener(new OnCheckedChangeListener() {
 			@Override
 			public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
@@ -75,21 +74,20 @@ public class SettingsActivity extends Activity {
 				findViewById(R.id.seekBarVibrationDuration).setEnabled(isChecked);
 			}
 		});
-		
+
 		et_distance.addTextChangedListener(new TextWatcher() {
-			
+
 			@Override
 			public void onTextChanged(CharSequence s, int start, int before, int count) {
-				
+
 			}
-			
+
 			@Override
-			public void beforeTextChanged(CharSequence s, int start, int count,
-					int after) {
+			public void beforeTextChanged(CharSequence s, int start, int count, int after) {
 				// TODO Auto-generated method stub
-				
+
 			}
-			
+
 			@Override
 			public void afterTextChanged(Editable s) {
 				if (s.toString().equalsIgnoreCase(""))
@@ -98,7 +96,24 @@ public class SettingsActivity extends Activity {
 					settings.edit().putInt("distance", Integer.parseInt(String.valueOf(s.toString()))).commit();
 			}
 		});
-		
+
+		Switch autoSynch = (Switch) findViewById(R.id.switchAutoSynch);
+
+		// TO BE TESTED
+		// read the current configuration - default true
+		autoSynch.setChecked(settings.getBoolean("autoSynch", true));
+
+		// listener for switch autoSynch
+		autoSynch.setOnCheckedChangeListener(new OnCheckedChangeListener() {
+
+			@Override
+			public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+				Log.d("Switch State=", "" + isChecked);
+				settings.edit().putBoolean("autoSynch", isChecked).commit();
+			}
+
+		});
+
 	}
 
 	@Override
@@ -107,10 +122,5 @@ public class SettingsActivity extends Activity {
 		getMenuInflater().inflate(R.menu.settings, menu);
 		return true;
 	}
-	
-	
 
-
-	
-	
 }
