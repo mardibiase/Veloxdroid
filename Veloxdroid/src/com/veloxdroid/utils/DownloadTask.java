@@ -70,8 +70,8 @@ public class DownloadTask extends AsyncTask<String, Integer, String> {
                 input = connection.getInputStream();
                 
                 //modifica marco - proviamo ad usare la variabile statica della MainActivity
-                //File folder = new File(Environment.getExternalStorageDirectory() + "/veloxdroid");
-                File folder = new File(MainActivity.veloxdroid_sdcard_path);
+                File folder = new File(Environment.getExternalStorageDirectory() + "/veloxdroid");
+                //File folder = new File(MainActivity.veloxdroid_sdcard_path);
                 if (!folder.exists()) {
                     folder.mkdir();
                 }	              

@@ -46,13 +46,13 @@ public class MainActivity extends Activity {
 				final DownloadTask downloadTask = new DownloadTask(MainActivity.this);
 				downloadTask.execute(file_url);
 			}
-			Toast toast = Toast.makeText(getApplicationContext(), "Bentornato in Veloxdroid", 5);
+			Toast toast = Toast.makeText(getApplicationContext(), "Bentornato in Veloxdroid", Toast.LENGTH_SHORT);
 			toast.show();
 			// redirect to NavigationActivity
 			Intent intent = new Intent(this, NavigationActivity.class);
 			startActivity(intent);
 		} else {
-			Toast toast = Toast.makeText(getApplicationContext(), "Benvenuto in Veloxdroid", 5);
+			Toast toast = Toast.makeText(getApplicationContext(), "Benvenuto in Veloxdroid", Toast.LENGTH_SHORT);
 			toast.show();
 		}
 	}
@@ -108,7 +108,7 @@ public class MainActivity extends Activity {
 
 	// method that downloads the file of the autoveloxesfires when clicking on the button Download on the GUI
 	public void downloadFiles(View view) {
-		Toast toast = Toast.makeText(getApplicationContext(), "Download file", 5);
+		Toast toast = Toast.makeText(getApplicationContext(), "Download file", Toast.LENGTH_SHORT);
 		toast.show();
 		// execute this when the downloader must be fired
 		// we have to do in an AsyncTask separately because Android doesn't allow to do this in a standard activity
@@ -140,7 +140,7 @@ public class MainActivity extends Activity {
 		switch (aRequestCode) {
 		case 99: { // hardcoded in doLogin
 			String result = aData.getData().toString();
-			Toast toast = Toast.makeText(getApplicationContext(), result, 10);
+			Toast toast = Toast.makeText(getApplicationContext(), result, Toast.LENGTH_SHORT);
 			toast.show();
 			Intent intent = new Intent(this, NavigationActivity.class);
 			startActivity(intent);

@@ -12,40 +12,34 @@
         android:id="@+id/txtInfo"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentTop="true"
-        android:layout_marginLeft="122dp"
-        android:layout_marginTop="100dp" />
+         android:layout_centerHorizontal="true"
+        android:layout_marginTop="10dp" />
 
     <Button
         android:id="@+id/send_autovelox"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
         android:layout_centerHorizontal="true"
-        android:layout_marginBottom="119dp"
-        android:text="@string/button_send_autovelox"
-        android:onClick="doSendAutovelox" />
+        android:layout_marginTop="70dp"
+        android:onClick="doSendAutovelox"
+        android:text="@string/button_send_autovelox" />
 
     <Button
         android:id="@+id/btn_feedback"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignTop="@+id/send_autovelox"
-        android:layout_marginTop="67dp"
-        android:text="@string/btn_feedback"
-        android:visibility="gone" 
-        android:onClick="doSendFeedback"/>
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="170dp"
+        android:onClick="doSendFeedback"
+        android:text="@string/btn_feedback" />
 
     <Button
         android:id="@+id/btn_deleteAutovelox"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignBottom="@+id/btn_feedback"
-        android:layout_marginLeft="28dp"
-        android:layout_toRightOf="@+id/txtInfo"
-        android:text="@string/btn_deleteAutovelox"
-        android:visibility="gone" 
-        android:onClick="doDeleteAutovelox"/>
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="270dp"
+        android:onClick="doDeleteAutovelox"
+        android:text="@string/btn_deleteAutovelox" />
 
 </RelativeLayout>
