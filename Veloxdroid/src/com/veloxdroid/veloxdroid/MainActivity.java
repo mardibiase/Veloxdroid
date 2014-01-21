@@ -76,9 +76,6 @@ public class MainActivity extends Activity {
 			Intent intent = new Intent(this, SettingsActivity.class);
 			startActivity(intent);
 			return true;
-		case R.id.Logout:
-			Utils.doLogout(getSharedPreferences(MainActivity.PREFS_NAME, 0));
-			startActivity(new Intent(this, MainActivity.class));
 		default:
 			return super.onOptionsItemSelected(item);
 		}

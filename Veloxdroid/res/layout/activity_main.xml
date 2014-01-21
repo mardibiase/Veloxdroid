@@ -9,44 +9,40 @@
     tools:context=".MainActivity" >
 
     <Button
-        android:id="@+id/button_downloadFiles"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentTop="true"
-        android:layout_centerHorizontal="true"
-        android:layout_marginTop="77dp"
-        android:text="@string/downloadFile_button"
-        android:onClick="downloadFiles" />
-
-    <Button
         android:id="@+id/button_login"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignParentLeft="true"
-        android:layout_below="@+id/button_downloadFiles"
-        android:layout_marginLeft="63dp"
-        android:layout_marginTop="69dp"
-        android:text="@string/button_login"
-        android:onClick="doLogin" />
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="10dp"
+        android:onClick="doLogin"
+        android:text="@string/button_login" />
+    
+    <Button
+        android:id="@+id/button_register"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="60dp"
+        android:text="@string/button_register"
+        android:onClick="doRegister" />
+
 
     <Button
         android:id="@+id/button_visitatore"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignBaseline="@+id/button_login"
-        android:layout_alignBottom="@+id/button_login"
-        android:layout_marginLeft="40dp"
-        android:layout_toRightOf="@+id/button_login"
-        android:text="@string/button_visitatore" 
-        android:onClick="doVisitatore"/>
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="150dp"
+        android:onClick="doVisitatore"
+        android:text="@string/button_visitatore" />
 
     <Button
-        android:id="@+id/button_register"
+        android:id="@+id/button_downloadFiles"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignLeft="@+id/button_login"
-        android:layout_below="@+id/button_login"
-        android:text="@string/button_register"
-        android:onClick="doRegister" />
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="220dp"
+        android:onClick="downloadFiles"
+        android:text="@string/downloadFile_button" />
 
 </RelativeLayout>

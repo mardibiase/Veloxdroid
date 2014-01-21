@@ -1,17 +1,20 @@
 package com.veloxdroid.veloxdroid;
 
+import com.veloxdroid.utils.UploadTask;
+import com.veloxdroid.utils.Utils;
+
 import android.os.Bundle;
-
 import android.app.Activity;
-
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
 import android.view.Menu;
-
+import android.view.MenuItem;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
+import android.widget.Toast;
 import android.widget.CompoundButton.OnCheckedChangeListener;
 import android.widget.EditText;
 import android.widget.SeekBar;
@@ -121,6 +124,42 @@ public class SettingsActivity extends Activity {
 		// Inflate the menu; this adds items to the action bar if it is present.
 		getMenuInflater().inflate(R.menu.settings, menu);
 		return true;
+	}
+
+	// fire this method when select Settings from the option menu on the top
+	// right of the GUI
+	@Override
+	public boolean onOptionsItemSelected(MenuItem item) {
+
+		switch (item.getItemId()) {
+		case R.id.deleteUser:
+
+			deleteUser();
+			
+			Intent intent = new Intent(this, MainActivity.class);
+			startActivity(intent);
+			return true;
+		default:
+			return super.onOptionsItemSelected(item);
+		}
+	}
+
+	// Delete user account from server and clear email field in shared preferencies
+	private void deleteUser() {
+
+		SharedPreferences settings = getSharedPreferences(MainActivity.PREFS_NAME, 0);
+		String email = settings.getString("eMail", "");
+
+		if (!email.equalsIgnoreCase("") && !email.equalsIgnoreCase("visitatore")) {
+			// Send delete request to server
+			Toast.makeText(getApplicationContext(), "Delete user", Toast.LENGTH_SHORT).show();
+			UploadTask task = new UploadTask();
+			task.setPostRequest("mail=" + email);
+			task.setRemotePath("VDServer/deleteUser");
+			task.execute();
+			// Also delete the email from shared preferencies
+			Utils.doLogout(settings);
+		}
 	}
 
 }
