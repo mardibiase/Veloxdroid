@@ -13,5 +13,9 @@ public class Utils {
 		else
 			return true;
 	}
+	
+	public static void doLogout(SharedPreferences settings){
+		settings.edit().putString("eMail", "").commit();
+	}
 
 }

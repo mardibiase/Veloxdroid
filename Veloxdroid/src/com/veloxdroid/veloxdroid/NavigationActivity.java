@@ -72,9 +72,11 @@ public class NavigationActivity extends Activity implements LocationListener {
 	public boolean onOptionsItemSelected(MenuItem item) {
 		switch (item.getItemId()) {
 		case R.id.action_settings:
-			Intent intent = new Intent(this, SettingsActivity.class);
-			startActivity(intent);
+			startActivity(new Intent(this, SettingsActivity.class));
 			return true;
+		case R.id.Logout:
+			Utils.doLogout(settings);
+			startActivity(new Intent(this, MainActivity.class));
 		default:
 			return super.onOptionsItemSelected(item);
 		}

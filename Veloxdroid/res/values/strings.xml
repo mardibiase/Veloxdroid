@@ -22,4 +22,5 @@
  	<string name="switch_auto_synch">Auto Synch</string>
  	<string name="btn_feedback">Feedback</string>
  	<string name="btn_deleteAutovelox">Delete</string>
+ 	<string name="logoutTitle">Logout</string>
 </resources>
