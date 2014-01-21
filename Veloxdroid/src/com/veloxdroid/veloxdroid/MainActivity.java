@@ -1,6 +1,7 @@
 package com.veloxdroid.veloxdroid;
 
 import com.veloxdroid.utils.DownloadTask;
+import com.veloxdroid.utils.Utils;
 
 import android.app.Activity;
 import android.app.ProgressDialog;
@@ -19,6 +20,7 @@ public class MainActivity extends Activity {
 
 	public static final String PREFS_NAME = "vdPreferences";
 	public static String veloxdroid_sdcard_path = Environment.getExternalStorageDirectory() + "/" + "veloxdroid";
+	// public static String veloxdroid_sdcard_path = Environment.getExternalStoragePublicDirectory(Environment.) + "/" + "veloxdroid";
 	public static String avFissi_fileName = "Autovelox_Fissi.csv";
 	public static String avMobili_fileName = "Autovelox_Mobili.csv";
 	public static String avFissi_path = veloxdroid_sdcard_path + "/" + avFissi_fileName;
@@ -38,7 +40,7 @@ public class MainActivity extends Activity {
 		super.onStart();
 		// check whether it's the first time you use the app
 		// if the user is logged in, checkLogin() returns true else returns false
-		if (checkLogin()) {
+		if (Utils.checkLogin(getSharedPreferences(MainActivity.PREFS_NAME, 0))) {
 			// Check if the user has selected to automatically download autovelox files
 			if (checkAutoSynch()) {
 				// automatically fires download file - we do not pass from downloadFiles
@@ -82,21 +84,21 @@ public class MainActivity extends Activity {
 
 	// static reference to checkLogin - because we need a context from where
 	// recover getSharedPrefereces in the private method below
-	public static boolean checkLogin(Context context) {
-		MainActivity ma = (MainActivity) context;
-		return ma.checkLogin();
-	}
-
-	// checks whether the user is logged with his email
-	private boolean checkLogin() {
-		SharedPreferences settings = getSharedPreferences(MainActivity.PREFS_NAME, 0);
-		String s = settings.getString("eMail", "");
-		Log.d("checkLogin", s);
-		if (s.equalsIgnoreCase(""))
-			return false;
-		else
-			return true;
-	}
+//	public static boolean checkLogin(Context context) {
+//		MainActivity ma = (MainActivity) context;
+//		return ma.checkLogin();
+//	}
+//
+//	// checks whether the user is logged with his email
+//	private boolean checkLogin() {
+//		SharedPreferences settings = getSharedPreferences(MainActivity.PREFS_NAME, 0);
+//		String s = settings.getString("eMail", "");
+//		Log.d("checkLogin", s);
+//		if (s.equalsIgnoreCase("") || s.equalsIgnoreCase("visitatore"))
+//			return false;
+//		else
+//			return true;
+//	}
 
 	// checks whether the user has enabled/disabled auto synch of the Autovelox files
 	private boolean checkAutoSynch() {
@@ -147,6 +149,19 @@ public class MainActivity extends Activity {
 			break;
 		}
 		}
+	}
+
+	// handler for button visitatore in the GUI
+	public void doVisitatore(View view) {
+		// redirect to NavigationActivity
+		Intent intent = new Intent(this, NavigationActivity.class);
+		startActivity(intent);
+	}
+
+	// handler for button register in the GUI
+	public void doRegister(View view) {
+		//doRegister va in doLogin - è la stessa parte della GUI
+		doLogin(view);
 	}
 
 }

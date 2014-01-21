@@ -70,15 +70,15 @@ public class DownloadTask extends AsyncTask<String, Integer, String> {
                 input = connection.getInputStream();
                 
                 //modifica marco - proviamo ad usare la variabile statica della MainActivity
-                File folder = new File(Environment.getExternalStorageDirectory() + "/veloxdroid");
-                //File folder = new File(MainActivity.veloxdroid_sdcard_path);
+                //File folder = new File(Environment.getExternalStorageDirectory() + "/veloxdroid");
+                File folder = new File(MainActivity.veloxdroid_sdcard_path);
                 if (!folder.exists()) {
                     folder.mkdir();
                 }	              
                 
                 //modifica marco - proviamo ad usare la variabile statica della MainActivity
                 //output = new FileOutputStream(folder.getAbsolutePath().toString() + "/Autovelox_Fissi.csv");
-                output = new FileOutputStream(MainActivity.avFissi_fileName);
+                output = new FileOutputStream(MainActivity.avFissi_path);
 
                 byte data[] = new byte[4096];
                 long total = 0;
