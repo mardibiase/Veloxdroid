@@ -46,8 +46,10 @@ public class MainActivity extends Activity {
 			if (checkAutoSynch()) {
 				// automatically fires download file - we do not pass from downloadFiles
 				// but instead we directly instantiate a new DownloadTask and execute it
-				final DownloadTask downloadTask = new DownloadTask(MainActivity.this);
-				downloadTask.execute(urlRemoteServer + "download");
+				final DownloadTask downloadTaskFissi = new DownloadTask(MainActivity.this);
+				downloadTaskFissi.execute(urlRemoteServer + "download/fissi");
+				final DownloadTask downloadTaskMobili = new DownloadTask(MainActivity.this);
+				downloadTaskMobili.execute(urlRemoteServer + "download/mobili");
 			}
 			Toast toast = Toast.makeText(getApplicationContext(), "Bentornato in Veloxdroid", Toast.LENGTH_SHORT);
 			toast.show();
@@ -109,15 +111,19 @@ public class MainActivity extends Activity {
 		return autoSynch;
 	}
 
-	// method that downloads the file of the autoveloxesfires when clicking on the button Download on the GUI
+	// method that downloads the file of the autoveloxes fires when clicking on the button Download on the GUI
 	public void downloadFiles(View view) {
 		Toast toast = Toast.makeText(getApplicationContext(), "Download file", Toast.LENGTH_SHORT);
 		toast.show();
 		// execute this when the downloader must be fired
 		// we have to do in an AsyncTask separately because Android doesn't allow to do this in a standard activity
-		final DownloadTask downloadTask = new DownloadTask(MainActivity.this);
-		downloadTask.execute(urlRemoteServer + "download");
-
+		final DownloadTask downloadTaskFissi = new DownloadTask(MainActivity.this);
+		downloadTaskFissi.execute(urlRemoteServer + "download/fissi");		
+		//check whether you are logged or not -> you don't need the Autovelox_Mobili.csv
+		if (Utils.checkLogin(getSharedPreferences(MainActivity.PREFS_NAME, 0))) {
+			final DownloadTask downloadTaskMobili = new DownloadTask(MainActivity.this);
+			downloadTaskMobili.execute(urlRemoteServer + "download/mobili");
+		}
 		/********************
 		 * // TODO - controllare perchè questa mProgressDialog dava dei problemi
 		 ********************/
@@ -145,6 +151,10 @@ public class MainActivity extends Activity {
 			String result = aData.getData().toString();
 			Toast toast = Toast.makeText(getApplicationContext(), result, Toast.LENGTH_SHORT);
 			toast.show();
+			final DownloadTask downloadTaskFissi = new DownloadTask(MainActivity.this);
+			downloadTaskFissi.execute(urlRemoteServer + "download/fissi");
+			final DownloadTask downloadTaskMobili = new DownloadTask(MainActivity.this);
+			downloadTaskMobili.execute(urlRemoteServer + "download/mobili");
 			Intent intent = new Intent(this, NavigationActivity.class);
 			startActivity(intent);
 			break;

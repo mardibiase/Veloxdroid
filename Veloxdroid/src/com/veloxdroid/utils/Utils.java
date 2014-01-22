@@ -30,9 +30,10 @@ public class Utils {
 	
 	public static void doLogout(SharedPreferences settings){
 		settings.edit().putString("eMail", "").commit();
+		File f = new File(MainActivity.avMobili_path);
+		if(f.exists()) f.delete();
 	}
-
-	
+		
 	public static void saveAsynchOperation(String opType, double latit, double longit){
 		
 		PrintWriter out;
@@ -81,7 +82,8 @@ public class Utils {
 			File file = new File(MainActivity.savedAsynchOperation_path);
 			file.delete();
 			
-		} catch (FileNotFoundException e) {
+		} 
+		catch (FileNotFoundException e) {
 			e.printStackTrace();
 		} catch (IOException e) {
 			e.printStackTrace();

@@ -29,8 +29,7 @@ import com.veloxdroid.veloxdroid.MainActivity;
 /*
  * To Do: 
  * Prevedere il download multiplo dei file (fissi e mobili)
- * Prevedere l'eccezione sul server
- * */
+ */
 
 public class DownloadTask extends AsyncTask<String, Integer, String> {
 
@@ -73,17 +72,15 @@ public class DownloadTask extends AsyncTask<String, Integer, String> {
 				int fileLength = connection.getContentLength();
 				// download the file
 				input = connection.getInputStream();
-
-				// modifica marco - proviamo ad usare la variabile statica della MainActivity
-				// File folder = new File(Environment.getExternalStorageDirectory() + "/veloxdroid");
+				
 				File folder = new File(MainActivity.veloxdroid_sdcard_path);
 				if (!folder.exists()) {
 					folder.mkdir();
 				}
-
-				// modifica marco - proviamo ad usare la variabile statica della MainActivity
-				// output = new FileOutputStream(folder.getAbsolutePath().toString() + "/Autovelox_Fissi.csv");
+				
+				if(url.getPath().contains("fissi"))
 				output = new FileOutputStream(MainActivity.avFissi_path);
+				else output = new FileOutputStream(MainActivity.avMobili_path);
 
 				byte data[] = new byte[4096];
 				long total = 0;
