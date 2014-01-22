@@ -155,6 +155,9 @@ public class MainActivity extends Activity {
 	// handler for button visitatore in the GUI
 	public void doVisitatore(View view) {
 		// redirect to NavigationActivity
+		SharedPreferences settings = getSharedPreferences(MainActivity.PREFS_NAME, 0);
+		settings.edit().putString("eMail", "Visitatore").commit();
+		
 		Intent intent = new Intent(this, NavigationActivity.class);
 		startActivity(intent);
 	}

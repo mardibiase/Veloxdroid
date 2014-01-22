@@ -6,6 +6,7 @@
         android:showAsAction="never"
         android:title="@string/action_settings"/>
     <item android:id="@+id/Logout"
+        android:orderInCategory="101"
         android:title="@string/logoutTitle"
         android:showAsAction="never"/>
 
