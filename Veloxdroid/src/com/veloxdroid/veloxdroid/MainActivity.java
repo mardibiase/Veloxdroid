@@ -20,15 +20,14 @@ public class MainActivity extends Activity {
 
 	public static final String PREFS_NAME = "vdPreferences";
 	public static String veloxdroid_sdcard_path = Environment.getExternalStorageDirectory() + "/" + "veloxdroid";
-	// public static String veloxdroid_sdcard_path = Environment.getExternalStoragePublicDirectory(Environment.) + "/" + "veloxdroid";
 	public static String avFissi_fileName = "Autovelox_Fissi.csv";
 	public static String avMobili_fileName = "Autovelox_Mobili.csv";
 	public static String savedAsynchOperation_fileName = "SavedAsynchOperation.csv";
 	public static String avFissi_path = veloxdroid_sdcard_path + "/" + avFissi_fileName;
 	public static String avMobili_path = veloxdroid_sdcard_path + "/" + avMobili_fileName;
 	public static String savedAsynchOperation_path = veloxdroid_sdcard_path + "/" + savedAsynchOperation_fileName;
+    public static String urlRemoteServer = "http://10.0.2.2:8080/VDServer/";
 	
-	private static String file_url = "http://10.0.2.2:8080/VDServer/download";
 	private ProgressDialog mProgressDialog;
 
 	@Override
@@ -48,7 +47,7 @@ public class MainActivity extends Activity {
 				// automatically fires download file - we do not pass from downloadFiles
 				// but instead we directly instantiate a new DownloadTask and execute it
 				final DownloadTask downloadTask = new DownloadTask(MainActivity.this);
-				downloadTask.execute(file_url);
+				downloadTask.execute(urlRemoteServer + "download");
 			}
 			Toast toast = Toast.makeText(getApplicationContext(), "Bentornato in Veloxdroid", Toast.LENGTH_SHORT);
 			toast.show();
@@ -86,21 +85,21 @@ public class MainActivity extends Activity {
 
 	// static reference to checkLogin - because we need a context from where
 	// recover getSharedPrefereces in the private method below
-//	public static boolean checkLogin(Context context) {
-//		MainActivity ma = (MainActivity) context;
-//		return ma.checkLogin();
-//	}
-//
-//	// checks whether the user is logged with his email
-//	private boolean checkLogin() {
-//		SharedPreferences settings = getSharedPreferences(MainActivity.PREFS_NAME, 0);
-//		String s = settings.getString("eMail", "");
-//		Log.d("checkLogin", s);
-//		if (s.equalsIgnoreCase("") || s.equalsIgnoreCase("visitatore"))
-//			return false;
-//		else
-//			return true;
-//	}
+	// public static boolean checkLogin(Context context) {
+	// MainActivity ma = (MainActivity) context;
+	// return ma.checkLogin();
+	// }
+	//
+	// // checks whether the user is logged with his email
+	// private boolean checkLogin() {
+	// SharedPreferences settings = getSharedPreferences(MainActivity.PREFS_NAME, 0);
+	// String s = settings.getString("eMail", "");
+	// Log.d("checkLogin", s);
+	// if (s.equalsIgnoreCase("") || s.equalsIgnoreCase("visitatore"))
+	// return false;
+	// else
+	// return true;
+	// }
 
 	// checks whether the user has enabled/disabled auto synch of the Autovelox files
 	private boolean checkAutoSynch() {
@@ -117,7 +116,7 @@ public class MainActivity extends Activity {
 		// execute this when the downloader must be fired
 		// we have to do in an AsyncTask separately because Android doesn't allow to do this in a standard activity
 		final DownloadTask downloadTask = new DownloadTask(MainActivity.this);
-		downloadTask.execute(file_url);
+		downloadTask.execute(urlRemoteServer + "download");
 
 		/********************
 		 * // TODO - controllare perchè questa mProgressDialog dava dei problemi
@@ -138,7 +137,6 @@ public class MainActivity extends Activity {
 		Intent intent = new Intent(this, LoginActivity.class);
 		startActivityForResult(intent, requestCode);
 	}
-	
 
 	@Override
 	protected void onActivityResult(int aRequestCode, int aResultCode, Intent aData) {
@@ -151,6 +149,7 @@ public class MainActivity extends Activity {
 			startActivity(intent);
 			break;
 		}
+
 		}
 	}
 
@@ -159,14 +158,14 @@ public class MainActivity extends Activity {
 		// redirect to NavigationActivity
 		SharedPreferences settings = getSharedPreferences(MainActivity.PREFS_NAME, 0);
 		settings.edit().putString("eMail", "Visitatore").commit();
-		
+
 		Intent intent = new Intent(this, NavigationActivity.class);
 		startActivity(intent);
 	}
 
 	// handler for button register in the GUI
 	public void doRegister(View view) {
-		//doRegister va in doLogin - è la stessa parte della GUI
+		// doRegister va in doLogin - è la stessa parte della GUI
 		doLogin(view);
 	}
 

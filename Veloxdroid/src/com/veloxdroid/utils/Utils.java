@@ -67,11 +67,11 @@ public class Utils {
 				task.setPostRequest("latit=" + numForm.format(Double.parseDouble(strLatit)) + "&longit=" + numForm.format(Double.parseDouble(strLongit)));
 				
 				if (strOpType.equalsIgnoreCase("Send"))
-					task.setRemotePath("VDServer/upload");
+					task.setRemotePath("upload");
 				else if (strOpType.equalsIgnoreCase("Feed"))
-					task.setRemotePath("VDServer/feedback");
+					task.setRemotePath("feedback");
 				else
-					task.setRemotePath("VDServer/deleteAV");
+					task.setRemotePath("deleteAV");
 				
 				task.execute();
 			}

@@ -167,7 +167,7 @@ public class SettingsActivity extends Activity {
 			Toast.makeText(getApplicationContext(), "Delete user", Toast.LENGTH_SHORT).show();
 			UploadTask task = new UploadTask();
 			task.setPostRequest("mail=" + email);
-			task.setRemotePath("VDServer/deleteUser");
+			task.setRemotePath("deleteUser");
 			task.execute();
 			// Also delete the email from shared preferencies
 			Utils.doLogout(settings);

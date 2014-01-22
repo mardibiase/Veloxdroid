@@ -160,7 +160,7 @@ public class NavigationActivity extends Activity implements LocationListener {
 					Toast.makeText(getApplicationContext(), "Send autovelox", Toast.LENGTH_SHORT).show();
 					UploadTask task = new UploadTask();
 					task.setPostRequest("latit=" + numForm.format(latit) + "&longit=" + numForm.format(longit));
-					task.setRemotePath("VDServer/upload");
+					task.setRemotePath("upload");
 					task.execute();
 				} else {
 					Toast.makeText(getApplicationContext(), "Send autovelox buffered", Toast.LENGTH_SHORT).show();
@@ -185,7 +185,7 @@ public class NavigationActivity extends Activity implements LocationListener {
 					UploadTask task = new UploadTask();
 
 					task.setPostRequest("latit=" + numForm.format(latit) + "&longit=" + numForm.format(longit));
-					task.setRemotePath("VDServer/feedback");
+					task.setRemotePath("feedback");
 					task.execute();
 				} else {
 					Toast.makeText(getApplicationContext(), "Feedback autovelox buffered", Toast.LENGTH_SHORT).show();
@@ -211,7 +211,7 @@ public class NavigationActivity extends Activity implements LocationListener {
 					Toast.makeText(getApplicationContext(), "Delete autovelox", Toast.LENGTH_SHORT).show();
 					UploadTask task = new UploadTask();
 					task.setPostRequest("latit=" + numForm.format(latit) + "&longit=" + numForm.format(longit));
-					task.setRemotePath("VDServer/deleteAV");
+					task.setRemotePath("deleteAV");
 					task.execute();
 				} else {
 					Toast.makeText(getApplicationContext(), "Delete autovelox buffered", Toast.LENGTH_SHORT).show();

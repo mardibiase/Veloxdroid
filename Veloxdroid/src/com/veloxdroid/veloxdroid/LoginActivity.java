@@ -10,8 +10,12 @@ import org.apache.http.HttpResponse;
 import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpPost;
+import org.apache.http.conn.ConnectTimeoutException;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.params.BasicHttpParams;
+import org.apache.http.params.HttpConnectionParams;
+import org.apache.http.params.HttpParams;
 import org.apache.http.util.EntityUtils;
 
 import android.animation.Animator;
@@ -32,6 +36,7 @@ import android.view.View;
 import android.view.inputmethod.EditorInfo;
 import android.widget.EditText;
 import android.widget.TextView;
+import android.widget.Toast;
 
 /**
  * Activity which displays a login screen to the user, offering registration as
@@ -101,7 +106,7 @@ public class LoginActivity extends Activity {
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		super.onCreateOptionsMenu(menu);
-		getMenuInflater().inflate(R.menu.login, menu);
+		//getMenuInflater().inflate(R.menu.login, menu);
 		return true;
 	}
 
@@ -203,6 +208,12 @@ public class LoginActivity extends Activity {
 		}
 	}
 
+	@Override
+	public void onBackPressed() {
+	    Intent intent = new Intent(this, MainActivity.class);
+	    startActivity(intent);
+	}
+	
 	/**
 	 * Represents an asynchronous login/registration task used to authenticate
 	 * the user.
@@ -223,7 +234,7 @@ public class LoginActivity extends Activity {
 				// TODO Auto-generated catch block
 				e2.printStackTrace();
 			}			
-			HttpClient client = new DefaultHttpClient();
+			
 			StringEntity stringEnt = null;
 			Boolean toReturn = false;
 			try {
@@ -232,12 +243,23 @@ public class LoginActivity extends Activity {
 				// TODO Auto-generated catch block
 				e1.printStackTrace();
 			}
-			HttpPost post = new HttpPost("http://10.0.2.2:8080/VDServer/login");
+			HttpPost post = new HttpPost(MainActivity.urlRemoteServer + "login");
+			HttpParams httpParameters = new BasicHttpParams();
+			// Set the timeout in milliseconds until a connection is established.
+			// The default value is zero, that means the timeout is not used. 
+			int timeoutConnection = 3000;
+			HttpConnectionParams.setConnectionTimeout(httpParameters, timeoutConnection);
+			// Set the default socket timeout (SO_TIMEOUT) 
+			// in milliseconds which is the timeout for waiting for data.
+			int timeoutSocket = 5000;
+			HttpConnectionParams.setSoTimeout(httpParameters, timeoutSocket);
+			DefaultHttpClient httpClient = new DefaultHttpClient(httpParameters);
+			
 			post.addHeader("content-type", "application/x-www-form-urlencoded");
 			post.setEntity(stringEnt);
 
 			try {
-				HttpResponse response = client.execute(post);
+				HttpResponse response = httpClient.execute(post);
 				HttpEntity responseEntity = response.getEntity();
 				String responseString = EntityUtils.toString(responseEntity);
 				System.out.println(responseString);
@@ -249,7 +271,14 @@ public class LoginActivity extends Activity {
 					loginResult = "NO";
 					toReturn = false;					
 				}
-			} catch (UnsupportedEncodingException e) {
+			}
+			catch (ConnectTimeoutException cte ){
+				loginResult = "Operation timed out";
+				toReturn = false;
+//				Intent intent = new Intent(null, MainActivity.class);
+//				startActivity(intent);
+			}
+			catch (UnsupportedEncodingException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			} catch (ClientProtocolException e) {
@@ -270,14 +299,21 @@ public class LoginActivity extends Activity {
 			if (success) {
 				resultIntent = new Intent();
 				Uri temp = Uri.parse(loginResult);
-				resultIntent.setData(temp);
+				resultIntent.setData(temp);				
 				setResult(Activity.RESULT_OK, resultIntent);
 				SharedPreferences settings = getSharedPreferences(MainActivity.PREFS_NAME, 0);
 				settings.edit().putString("eMail", mEmail).commit();
 				finish();										
 			} else {
-				mPasswordView.setError(getString(R.string.error_incorrect_password));
-				mPasswordView.requestFocus();
+				if(loginResult.contains("timed out")){
+					Toast toast = Toast.makeText(getApplicationContext(), loginResult, Toast.LENGTH_SHORT);
+					toast.show();					
+				}
+				else{
+					mPasswordView.setError(getString(R.string.error_incorrect_password));
+					mPasswordView.requestFocus();
+				}
+				
 			}
 		}
 
