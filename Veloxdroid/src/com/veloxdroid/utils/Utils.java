@@ -39,7 +39,7 @@ public class Utils {
 		PrintWriter out;
 		try {
 			out = new PrintWriter(new BufferedWriter(new FileWriter(MainActivity.savedAsynchOperation_path, true)));
-		    out.print(opType + "," + latit + "," + longit + "\n");
+		    out.print(opType + "," + longit + "," + latit + "\n");
 		    out.close();
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -62,8 +62,9 @@ public class Utils {
 				StringTokenizer st = new StringTokenizer(line, ",");
 				
 				String strOpType = st.nextToken();
-				String strLatit = st.nextToken();
 				String strLongit = st.nextToken();
+				String strLatit = st.nextToken();
+
 
 				task.setPostRequest("latit=" + numForm.format(Double.parseDouble(strLatit)) + "&longit=" + numForm.format(Double.parseDouble(strLongit)));
 				
