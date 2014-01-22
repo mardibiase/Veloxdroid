@@ -14,6 +14,7 @@ import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -31,7 +32,7 @@ public class NavigationActivity extends Activity implements LocationListener {
 
 	private Location lastKnowLocation;
 	private LocationManager lm;
-	private TextView txtInfo;
+	private TextView textLatit, textLongit, textSpeed;
 	private SearcherAutovelox2 searcherAutovelox;
 	private Thread threadAutovelox;
 	private SharedPreferences settings;
@@ -42,7 +43,9 @@ public class NavigationActivity extends Activity implements LocationListener {
 		super.onCreate(savedInstanceState);
 
 		setContentView(R.layout.activity_navigation);
-		txtInfo = (TextView) findViewById(R.id.txtInfo);
+		textLatit = (TextView) findViewById(R.id.valueLatit);
+		textLongit = (TextView) findViewById(R.id.valueLongit);
+		textSpeed = (TextView) findViewById(R.id.valueSpeed);
 		lm = (LocationManager) getSystemService(LOCATION_SERVICE);
 
 		settings = getSharedPreferences(MainActivity.PREFS_NAME, 0);
@@ -90,6 +93,8 @@ public class NavigationActivity extends Activity implements LocationListener {
 
 	@Override
 	public void onLocationChanged(Location location) {
+		
+		Log.d("Location", "New Location received");
 		// TODO Auto-generated method stub
 		// 4km è 0.035 di distanza in double usando latitudine e logitudine
 		// 5 decimali
@@ -115,7 +120,11 @@ public class NavigationActivity extends Activity implements LocationListener {
 		if (!threadAutovelox.isAlive())
 			this.runOnUiThread(searcherAutovelox);
 
-		txtInfo.setText("Latitude: " + location.getLatitude() + " Logitude: " + location.getLongitude());
+		textLatit.setText(numForm.format(location.getLatitude()));
+		textLongit.setText(numForm.format(location.getLongitude()));
+		
+		double km = location.getSpeed() * 3.6;
+		textSpeed.setText((int)km + "km/h");
 	}
 
 	@Override
@@ -206,5 +215,7 @@ public class NavigationActivity extends Activity implements LocationListener {
 		findViewById(R.id.btn_feedback).setVisibility(View.INVISIBLE);
 		
 	}
+	
+
 
 }
