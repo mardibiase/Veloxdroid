@@ -23,9 +23,11 @@ public class MainActivity extends Activity {
 	// public static String veloxdroid_sdcard_path = Environment.getExternalStoragePublicDirectory(Environment.) + "/" + "veloxdroid";
 	public static String avFissi_fileName = "Autovelox_Fissi.csv";
 	public static String avMobili_fileName = "Autovelox_Mobili.csv";
+	public static String savedAsynchOperation_fileName = "SavedAsynchOperation.csv";
 	public static String avFissi_path = veloxdroid_sdcard_path + "/" + avFissi_fileName;
 	public static String avMobili_path = veloxdroid_sdcard_path + "/" + avMobili_fileName;
-
+	public static String savedAsynchOperation_path = veloxdroid_sdcard_path + "/" + savedAsynchOperation_fileName;
+	
 	private static String file_url = "http://10.0.2.2:8080/VDServer/download";
 	private ProgressDialog mProgressDialog;
 

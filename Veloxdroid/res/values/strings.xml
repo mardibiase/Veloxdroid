@@ -19,17 +19,17 @@
     <string name="button_send_autovelox">Send Autovelox</string>
     <string name="title_activity_navigation">NavigationActivity</string>
     <string name="title_activity_settings">SettingsActivity</string>
- 	<string name="switch_auto_synch">Auto Synch</string>
- 	<string name="btn_feedback">Feedback</string>
- 	<string name="btn_deleteAutovelox">Delete</string>
- 	<string name="logoutTitle">Logout</string>
- 	<string name="deleteUserTitle">Delete User</string>
- 	
- 	<string name="textLatit">Latitude:</string>
- 	<string name="textLongit">Longitude:</string>
- 	<string name="textSpeed">Speed:</string>
- 	<string name="valueLatit">0</string>
- 	<string name="valueLongit">0</string>
- 	<string name="valueSpeed">0 km/h</string>
- 	
- 	</resources>
+    <string name="switch_auto_synch">Auto Synch</string>
+    <string name="btn_feedback">Feedback</string>
+    <string name="btn_deleteAutovelox">Delete</string>
+    <string name="logoutTitle">Logout</string>
+    <string name="deleteUserTitle">Delete User</string>
+    <string name="textLatit">Latitude:</string>
+    <string name="textLongit">Longitude:</string>
+    <string name="textSpeed">Speed:</string>
+    <string name="valueLatit">0</string>
+    <string name="valueLongit">0</string>
+    <string name="valueSpeed">0 km/h</string>
+    <string name="buttonFlush">Flush</string>
+
+</resources>

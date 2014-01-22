@@ -93,7 +93,7 @@ public class NavigationActivity extends Activity implements LocationListener {
 
 	@Override
 	public void onLocationChanged(Location location) {
-		
+
 		Log.d("Location", "New Location received");
 		// TODO Auto-generated method stub
 		// 4km è 0.035 di distanza in double usando latitudine e logitudine
@@ -122,9 +122,9 @@ public class NavigationActivity extends Activity implements LocationListener {
 
 		textLatit.setText(numForm.format(location.getLatitude()));
 		textLongit.setText(numForm.format(location.getLongitude()));
-		
+
 		double km = location.getSpeed() * 3.6;
-		textSpeed.setText((int)km + "km/h");
+		textSpeed.setText((int) km + "km/h");
 	}
 
 	@Override
@@ -150,39 +150,47 @@ public class NavigationActivity extends Activity implements LocationListener {
 	// listener for the send Autvelox button
 	public void doSendAutovelox(View view) {
 		if (!Utils.checkLogin(getSharedPreferences(MainActivity.PREFS_NAME, 0))) {
-			/**
-			 * TO FIX
-			 */
 			Toast.makeText(getApplicationContext(), "Visitatore! Non puoi inviare autovelox", Toast.LENGTH_SHORT).show();
 		} else {
 			if (lastKnowLocation != null) {
-				Toast.makeText(getApplicationContext(), "Send autovelox", Toast.LENGTH_SHORT).show();
-				UploadTask task = new UploadTask();
-				task.setPostRequest("latit=" + numForm.format(lastKnowLocation.getLatitude()) + "&longit=" + numForm.format(lastKnowLocation.getLongitude()));
-				task.setRemotePath("VDServer/upload");
-				task.execute();
+				double latit = lastKnowLocation.getLatitude();
+				double longit = lastKnowLocation.getLongitude();
+
+				if (settings.getBoolean("autoSynch", true)) {
+					Toast.makeText(getApplicationContext(), "Send autovelox", Toast.LENGTH_SHORT).show();
+					UploadTask task = new UploadTask();
+					task.setPostRequest("latit=" + numForm.format(latit) + "&longit=" + numForm.format(longit));
+					task.setRemotePath("VDServer/upload");
+					task.execute();
+				} else {
+					Toast.makeText(getApplicationContext(), "Send autovelox buffered", Toast.LENGTH_SHORT).show();
+					Utils.saveAsynchOperation("Send", latit, longit);
+				}
 			}
 		}
-		
+
 	}
 
 	// listener for the sendFeedback button
 	public void doSendFeedback(View view) {
 		if (!Utils.checkLogin(getSharedPreferences(MainActivity.PREFS_NAME, 0))) {
-			/**
-			 * TO FIX
-			 */
 			Toast.makeText(getApplicationContext(), "Visitatore! Non puoi inviare feedback", Toast.LENGTH_SHORT).show();
 		} else {
 
 			if (settings.getBoolean("position", false)) {
-				Toast.makeText(getApplicationContext(), "Feedback autovelox", Toast.LENGTH_SHORT).show();
-				UploadTask task = new UploadTask();
 				double latit = settings.getFloat("latit", 0);
 				double longit = settings.getFloat("longit", 0);
-				task.setPostRequest("latit=" + numForm.format(latit) + "&longit=" + numForm.format(longit));
-				task.setRemotePath("VDServer/feedback");
-				task.execute();				
+				if (settings.getBoolean("autoSynch", true)) {
+					Toast.makeText(getApplicationContext(), "Feedback autovelox", Toast.LENGTH_SHORT).show();
+					UploadTask task = new UploadTask();
+
+					task.setPostRequest("latit=" + numForm.format(latit) + "&longit=" + numForm.format(longit));
+					task.setRemotePath("VDServer/feedback");
+					task.execute();
+				} else {
+					Toast.makeText(getApplicationContext(), "Feedback autovelox buffered", Toast.LENGTH_SHORT).show();
+					Utils.saveAsynchOperation("Feed", latit, longit);
+				}
 			}
 		}
 		findViewById(R.id.btn_deleteAutovelox).setVisibility(View.INVISIBLE);
@@ -193,29 +201,29 @@ public class NavigationActivity extends Activity implements LocationListener {
 	// listener for the delete button
 	public void doDeleteAutovelox(View view) {
 		if (!Utils.checkLogin(getSharedPreferences(MainActivity.PREFS_NAME, 0))) {
-			/**
-			 * TO FIX
-			 */
 			Toast.makeText(getApplicationContext(), "Visitatore! Non puoi cancellare autovelox", Toast.LENGTH_SHORT).show();
 		} else {
 			if (settings.getBoolean("position", false)) {
-				Toast.makeText(getApplicationContext(), "Delete autovelox", Toast.LENGTH_SHORT).show();
 
-				UploadTask task = new UploadTask();
 				double latit = settings.getFloat("latit", 0);
 				double longit = settings.getFloat("longit", 0);
-				task.setPostRequest("latit=" + numForm.format(latit) + "&longit=" + numForm.format(longit));
-				task.setRemotePath("VDServer/deleteAV");
-				task.execute();
-				
+				if (settings.getBoolean("autoSynch", true)) {
+					Toast.makeText(getApplicationContext(), "Delete autovelox", Toast.LENGTH_SHORT).show();
+					UploadTask task = new UploadTask();
+					task.setPostRequest("latit=" + numForm.format(latit) + "&longit=" + numForm.format(longit));
+					task.setRemotePath("VDServer/deleteAV");
+					task.execute();
+				} else {
+					Toast.makeText(getApplicationContext(), "Delete autovelox buffered", Toast.LENGTH_SHORT).show();
+					Utils.saveAsynchOperation("Del", latit, longit);
+				}
+
 			}
-			
+
 		}
 		findViewById(R.id.btn_deleteAutovelox).setVisibility(View.INVISIBLE);
 		findViewById(R.id.btn_feedback).setVisibility(View.INVISIBLE);
-		
-	}
-	
 
+	}
 
 }

@@ -12,6 +12,7 @@ import android.text.TextWatcher;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.Toast;
@@ -113,9 +114,20 @@ public class SettingsActivity extends Activity {
 			public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
 				Log.d("Switch State=", "" + isChecked);
 				settings.edit().putBoolean("autoSynch", isChecked).commit();
+				// Disable the Flush button if the switch is set on
+				if (!isChecked)
+					findViewById(R.id.buttonFlush).setEnabled(true);
+				else
+					findViewById(R.id.buttonFlush).setEnabled(false);
 			}
 
 		});
+		
+		// Disable the Flush button if the switch is set on
+		if (settings.getBoolean("autoSynch", true))
+			findViewById(R.id.buttonFlush).setEnabled(false);
+		else
+			findViewById(R.id.buttonFlush).setEnabled(true);
 
 	}
 
@@ -135,7 +147,7 @@ public class SettingsActivity extends Activity {
 		case R.id.deleteUser:
 
 			deleteUser();
-			
+
 			Intent intent = new Intent(this, MainActivity.class);
 			startActivity(intent);
 			return true;
@@ -160,6 +172,11 @@ public class SettingsActivity extends Activity {
 			// Also delete the email from shared preferencies
 			Utils.doLogout(settings);
 		}
+	}
+
+	// listener for the Flush button
+	public void doAsynchFlush(View view) {
+		Utils.flushAsynchOperation();
 	}
 
 }

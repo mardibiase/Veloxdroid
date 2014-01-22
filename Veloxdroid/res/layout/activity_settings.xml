@@ -100,4 +100,14 @@
         android:layout_marginTop="20dp"
         android:text="@string/switch_auto_synch" />
 
+    <Button
+        android:id="@+id/buttonFlush"
+        style="?android:attr/buttonStyleSmall"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignTop="@+id/switchAutoSynch"
+        android:layout_toRightOf="@+id/editTextSetDistance"
+        android:text="@string/buttonFlush" 
+        android:onClick="doAsynchFlush"/>
+
 </RelativeLayout>
