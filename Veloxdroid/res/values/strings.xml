@@ -27,9 +27,11 @@
     <string name="textLatit">Latitude:</string>
     <string name="textLongit">Longitude:</string>
     <string name="textSpeed">Speed:</string>
+    <string name="textAutoveloxSpeed">Autovelox:</string>
     <string name="valueLatit">0</string>
     <string name="valueLongit">0</string>
     <string name="valueSpeed">0 km/h</string>
+    <string name="valueAutoveloxSpeed">None</string>
     <string name="buttonFlush">Flush</string>
 
 </resources>

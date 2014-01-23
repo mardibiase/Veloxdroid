@@ -56,6 +56,22 @@
         android:layout_marginTop="73dp"
         android:text="@string/valueSpeed" />
 
+    <TextView
+        android:id="@+id/textAutoveloxSpeed"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="100dp"
+        android:text="@string/textAutoveloxSpeed"
+        android:textAppearance="?android:attr/textAppearanceMedium" />
+
+    <TextView
+        android:id="@+id/valueAutoveloxSpeed"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="100dp"
+        android:layout_marginTop="103dp"
+        android:text="@string/valueAutoveloxSpeed" />
+
     <Button
         android:id="@+id/send_autovelox"
         android:layout_width="wrap_content"

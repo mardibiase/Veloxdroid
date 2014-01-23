@@ -2,15 +2,11 @@ package com.veloxdroid.veloxdroid;
 
 import com.veloxdroid.utils.DownloadTask;
 import com.veloxdroid.utils.Utils;
-
 import android.app.Activity;
-import android.app.ProgressDialog;
-import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Environment;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -28,7 +24,7 @@ public class MainActivity extends Activity {
 	public static String savedAsynchOperation_path = veloxdroid_sdcard_path + "/" + savedAsynchOperation_fileName;
     public static String urlRemoteServer = "http://10.0.2.2:8080/VDServer/";
 	
-	private ProgressDialog mProgressDialog;
+    private SharedPreferences settings;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -39,6 +35,9 @@ public class MainActivity extends Activity {
 	@Override
 	protected void onStart() {
 		super.onStart();
+		// Create a referment to shared preferencies
+		settings = getSharedPreferences(MainActivity.PREFS_NAME, 0);
+		
 		// check whether it's the first time you use the app
 		// if the user is logged in, checkLogin() returns true else returns false
 		if (Utils.checkLogin(getSharedPreferences(MainActivity.PREFS_NAME, 0))) {
@@ -46,19 +45,16 @@ public class MainActivity extends Activity {
 			if (checkAutoSynch()) {
 				// automatically fires download file - we do not pass from downloadFiles
 				// but instead we directly instantiate a new DownloadTask and execute it
-				final DownloadTask downloadTaskFissi = new DownloadTask(MainActivity.this);
-				downloadTaskFissi.execute(urlRemoteServer + "download/fissi");
-				final DownloadTask downloadTaskMobili = new DownloadTask(MainActivity.this);
-				downloadTaskMobili.execute(urlRemoteServer + "download/mobili");
+				new DownloadTask(MainActivity.this).execute(urlRemoteServer + "download/fissi");
+				new DownloadTask(MainActivity.this).execute(urlRemoteServer + "download/mobili");
 			}
-			Toast toast = Toast.makeText(getApplicationContext(), "Bentornato in Veloxdroid", Toast.LENGTH_SHORT);
-			toast.show();
+			Toast.makeText(getApplicationContext(), "Bentornato in Veloxdroid", Toast.LENGTH_SHORT).show();
 			// redirect to NavigationActivity
-			Intent intent = new Intent(this, NavigationActivity.class);
-			startActivity(intent);
+			startActivity(new Intent(this, NavigationActivity.class));
 		} else {
-			Toast toast = Toast.makeText(getApplicationContext(), "Benvenuto in Veloxdroid", Toast.LENGTH_SHORT);
-			toast.show();
+			if (checkAutoSynch())
+				new DownloadTask(MainActivity.this).execute(urlRemoteServer + "download/fissi");
+			Toast.makeText(getApplicationContext(), "Benvenuto in Veloxdroid", Toast.LENGTH_SHORT).show();
 		}
 	}
 
@@ -76,8 +72,7 @@ public class MainActivity extends Activity {
 
 		switch (item.getItemId()) {
 		case R.id.action_settings:
-			Intent intent = new Intent(this, SettingsActivity.class);
-			startActivity(intent);
+			startActivity(new Intent(this, SettingsActivity.class));
 			return true;
 		default:
 			return super.onOptionsItemSelected(item);
@@ -85,45 +80,22 @@ public class MainActivity extends Activity {
 
 	}
 
-	// static reference to checkLogin - because we need a context from where
-	// recover getSharedPrefereces in the private method below
-	// public static boolean checkLogin(Context context) {
-	// MainActivity ma = (MainActivity) context;
-	// return ma.checkLogin();
-	// }
-	//
-	// // checks whether the user is logged with his email
-	// private boolean checkLogin() {
-	// SharedPreferences settings = getSharedPreferences(MainActivity.PREFS_NAME, 0);
-	// String s = settings.getString("eMail", "");
-	// Log.d("checkLogin", s);
-	// if (s.equalsIgnoreCase("") || s.equalsIgnoreCase("visitatore"))
-	// return false;
-	// else
-	// return true;
-	// }
 
 	// checks whether the user has enabled/disabled auto synch of the Autovelox files
 	private boolean checkAutoSynch() {
-		SharedPreferences settings = getSharedPreferences(MainActivity.PREFS_NAME, 0);
-		boolean autoSynch = settings.getBoolean("autoSynch", true);
-		Log.d("autoSynch", String.valueOf(autoSynch));
-		return autoSynch;
+		return settings.getBoolean("autoSynch", true);
 	}
 
 	// method that downloads the file of the autoveloxes fires when clicking on the button Download on the GUI
 	public void downloadFiles(View view) {
-		Toast toast = Toast.makeText(getApplicationContext(), "Download file", Toast.LENGTH_SHORT);
-		toast.show();
+		Toast.makeText(getApplicationContext(), "Download file", Toast.LENGTH_SHORT).show();
 		// execute this when the downloader must be fired
 		// we have to do in an AsyncTask separately because Android doesn't allow to do this in a standard activity
-		final DownloadTask downloadTaskFissi = new DownloadTask(MainActivity.this);
-		downloadTaskFissi.execute(urlRemoteServer + "download/fissi");		
+		new DownloadTask(MainActivity.this).execute(urlRemoteServer + "download/fissi");		
 		//check whether you are logged or not -> you don't need the Autovelox_Mobili.csv
-		if (Utils.checkLogin(getSharedPreferences(MainActivity.PREFS_NAME, 0))) {
-			final DownloadTask downloadTaskMobili = new DownloadTask(MainActivity.this);
-			downloadTaskMobili.execute(urlRemoteServer + "download/mobili");
-		}
+		if (Utils.checkLogin(getSharedPreferences(MainActivity.PREFS_NAME, 0)))
+			new DownloadTask(MainActivity.this).execute(urlRemoteServer + "download/mobili");
+		
 		/********************
 		 * // TODO - controllare perchè questa mProgressDialog dava dei problemi
 		 ********************/
@@ -140,8 +112,7 @@ public class MainActivity extends Activity {
 	// listener on the Login button of the GUI
 	public void doLogin(View view) {
 		int requestCode = 99; // hardcoded
-		Intent intent = new Intent(this, LoginActivity.class);
-		startActivityForResult(intent, requestCode);
+		startActivityForResult(new Intent(this, LoginActivity.class), requestCode);
 	}
 
 	@Override
@@ -149,14 +120,12 @@ public class MainActivity extends Activity {
 		switch (aRequestCode) {
 		case 99: { // hardcoded in doLogin
 			String result = aData.getData().toString();
-			Toast toast = Toast.makeText(getApplicationContext(), result, Toast.LENGTH_SHORT);
-			toast.show();
-			final DownloadTask downloadTaskFissi = new DownloadTask(MainActivity.this);
-			downloadTaskFissi.execute(urlRemoteServer + "download/fissi");
-			final DownloadTask downloadTaskMobili = new DownloadTask(MainActivity.this);
-			downloadTaskMobili.execute(urlRemoteServer + "download/mobili");
-			Intent intent = new Intent(this, NavigationActivity.class);
-			startActivity(intent);
+			Toast.makeText(getApplicationContext(), result, Toast.LENGTH_SHORT).show();
+//			final DownloadTask downloadTaskFissi = new DownloadTask(MainActivity.this);
+//			downloadTaskFissi.execute(urlRemoteServer + "download/fissi");
+//			final DownloadTask downloadTaskMobili = new DownloadTask(MainActivity.this);
+//			downloadTaskMobili.execute(urlRemoteServer + "download/mobili");
+			startActivity(new Intent(this, NavigationActivity.class));
 			break;
 		}
 
@@ -166,11 +135,8 @@ public class MainActivity extends Activity {
 	// handler for button visitatore in the GUI
 	public void doVisitatore(View view) {
 		// redirect to NavigationActivity
-		SharedPreferences settings = getSharedPreferences(MainActivity.PREFS_NAME, 0);
 		settings.edit().putString("eMail", "Visitatore").commit();
-
-		Intent intent = new Intent(this, NavigationActivity.class);
-		startActivity(intent);
+		startActivity(new Intent(this, NavigationActivity.class));
 	}
 
 	// handler for button register in the GUI

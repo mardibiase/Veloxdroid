@@ -3,7 +3,7 @@ package com.veloxdroid.veloxdroid;
 import java.math.RoundingMode;
 import java.text.NumberFormat;
 
-import com.veloxdroid.utils.SearcherAutovelox2;
+import com.veloxdroid.utils.SearcherAutovelox;
 import com.veloxdroid.utils.UploadTask;
 import com.veloxdroid.utils.Utils;
 
@@ -32,8 +32,8 @@ public class NavigationActivity extends Activity implements LocationListener {
 
 	private Location lastKnowLocation;
 	private LocationManager lm;
-	private TextView textLatit, textLongit, textSpeed;
-	private SearcherAutovelox2 searcherAutovelox;
+	private TextView textLatit, textLongit, textSpeed, textAutoveloxSpeed;
+	private SearcherAutovelox searcherAutovelox;
 	private Thread threadAutovelox;
 	private SharedPreferences settings;
 	private NumberFormat numForm;
@@ -46,6 +46,7 @@ public class NavigationActivity extends Activity implements LocationListener {
 		textLatit = (TextView) findViewById(R.id.valueLatit);
 		textLongit = (TextView) findViewById(R.id.valueLongit);
 		textSpeed = (TextView) findViewById(R.id.valueSpeed);
+		textAutoveloxSpeed = (TextView) findViewById(R.id.valueAutoveloxSpeed);
 		lm = (LocationManager) getSystemService(LOCATION_SERVICE);
 
 		settings = getSharedPreferences(MainActivity.PREFS_NAME, 0);
@@ -54,13 +55,19 @@ public class NavigationActivity extends Activity implements LocationListener {
 		findViewById(R.id.btn_feedback).setVisibility(View.INVISIBLE);
 
 		// New runnable searcher autovelox class
-		searcherAutovelox = new SearcherAutovelox2(settings, getWindow().getDecorView().getRootView(), this);
+		searcherAutovelox = new SearcherAutovelox(settings, getWindow().getDecorView().getRootView(), this);
 		threadAutovelox = new Thread(searcherAutovelox);
 		// number format expression for latit and longit when doing delete/feedback/signal autovelox
 		numForm = NumberFormat.getInstance();
 		numForm.setMinimumFractionDigits(5);
 		numForm.setMaximumFractionDigits(5);
 		numForm.setRoundingMode(RoundingMode.HALF_DOWN);
+		
+		// Set the appropriate default value to text fields indicators
+		textLatit.setText("Waiting fix position");
+		textLongit.setText("Waiting fix position");
+		textSpeed.setText("Waiting fix position");
+		textAutoveloxSpeed.setText("Waiting fix position");
 	}
 
 	// Inflate the menu; this adds items to the action bar if it is present.

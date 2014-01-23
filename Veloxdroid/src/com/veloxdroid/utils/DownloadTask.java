@@ -8,22 +8,12 @@ import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.SocketTimeoutException;
 import java.net.URL;
-
-import org.apache.http.HttpEntity;
-import org.apache.http.HttpResponse;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.impl.client.DefaultHttpClient;
-import org.apache.http.params.BasicHttpParams;
-import org.apache.http.params.HttpConnectionParams;
-import org.apache.http.params.HttpParams;
-import org.apache.http.util.EntityUtils;
-
+import android.annotation.SuppressLint;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.os.AsyncTask;
 import android.os.PowerManager;
 import android.widget.Toast;
-
 import com.veloxdroid.veloxdroid.MainActivity;
 
 /*
@@ -46,6 +36,7 @@ public class DownloadTask extends AsyncTask<String, Integer, String> {
 		mProgressDialog.setCancelable(true);
 	}
 
+	@SuppressLint("Wakelock")
 	@Override
 	protected String doInBackground(String... sUrl) {
 		// take CPU lock to prevent CPU from going off if the user
@@ -87,8 +78,10 @@ public class DownloadTask extends AsyncTask<String, Integer, String> {
 				int count;
 				while ((count = input.read(data)) != -1) {
 					// allow canceling with back button
-					if (isCancelled())
+					if (isCancelled()){
+						input.close();
 						return null;
+					}
 					total += count;
 					// publishing the progress....
 					if (fileLength > 0) // only if total length is known
@@ -115,6 +108,7 @@ public class DownloadTask extends AsyncTask<String, Integer, String> {
 		} finally {
 			wl.release();
 		}
+		
 		return null;
 	}
 
