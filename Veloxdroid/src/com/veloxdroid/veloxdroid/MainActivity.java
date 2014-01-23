@@ -1,8 +1,8 @@
 package com.veloxdroid.veloxdroid;
 
-import com.veloxdroid.utils.DownloadTask;
-import com.veloxdroid.utils.Utils;
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
@@ -11,6 +11,9 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Toast;
+
+import com.veloxdroid.utils.DownloadTask;
+import com.veloxdroid.utils.Utils;
 
 public class MainActivity extends Activity {
 
@@ -22,9 +25,9 @@ public class MainActivity extends Activity {
 	public static String avFissi_path = veloxdroid_sdcard_path + "/" + avFissi_fileName;
 	public static String avMobili_path = veloxdroid_sdcard_path + "/" + avMobili_fileName;
 	public static String savedAsynchOperation_path = veloxdroid_sdcard_path + "/" + savedAsynchOperation_fileName;
-    public static String urlRemoteServer = "http://10.0.2.2:8080/VDServer/";
-	
-    private SharedPreferences settings;
+	public static String urlRemoteServer = "http://10.0.2.2:8080/VDServer/";
+
+	private SharedPreferences settings;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -37,7 +40,7 @@ public class MainActivity extends Activity {
 		super.onStart();
 		// Create a referment to shared preferencies
 		settings = getSharedPreferences(MainActivity.PREFS_NAME, 0);
-		
+
 		// check whether it's the first time you use the app
 		// if the user is logged in, checkLogin() returns true else returns false
 		if (Utils.checkLogin(getSharedPreferences(MainActivity.PREFS_NAME, 0))) {
@@ -80,7 +83,6 @@ public class MainActivity extends Activity {
 
 	}
 
-
 	// checks whether the user has enabled/disabled auto synch of the Autovelox files
 	private boolean checkAutoSynch() {
 		return settings.getBoolean("autoSynch", true);
@@ -91,11 +93,11 @@ public class MainActivity extends Activity {
 		Toast.makeText(getApplicationContext(), "Download file", Toast.LENGTH_SHORT).show();
 		// execute this when the downloader must be fired
 		// we have to do in an AsyncTask separately because Android doesn't allow to do this in a standard activity
-		new DownloadTask(MainActivity.this).execute(urlRemoteServer + "download/fissi");		
-		//check whether you are logged or not -> you don't need the Autovelox_Mobili.csv
+		new DownloadTask(MainActivity.this).execute(urlRemoteServer + "download/fissi");
+		// check whether you are logged or not -> you don't need the Autovelox_Mobili.csv
 		if (Utils.checkLogin(getSharedPreferences(MainActivity.PREFS_NAME, 0)))
 			new DownloadTask(MainActivity.this).execute(urlRemoteServer + "download/mobili");
-		
+
 		/********************
 		 * // TODO - controllare perchè questa mProgressDialog dava dei problemi
 		 ********************/
@@ -121,10 +123,10 @@ public class MainActivity extends Activity {
 		case 99: { // hardcoded in doLogin
 			String result = aData.getData().toString();
 			Toast.makeText(getApplicationContext(), result, Toast.LENGTH_SHORT).show();
-//			final DownloadTask downloadTaskFissi = new DownloadTask(MainActivity.this);
-//			downloadTaskFissi.execute(urlRemoteServer + "download/fissi");
-//			final DownloadTask downloadTaskMobili = new DownloadTask(MainActivity.this);
-//			downloadTaskMobili.execute(urlRemoteServer + "download/mobili");
+			// final DownloadTask downloadTaskFissi = new DownloadTask(MainActivity.this);
+			// downloadTaskFissi.execute(urlRemoteServer + "download/fissi");
+			// final DownloadTask downloadTaskMobili = new DownloadTask(MainActivity.this);
+			// downloadTaskMobili.execute(urlRemoteServer + "download/mobili");
 			startActivity(new Intent(this, NavigationActivity.class));
 			break;
 		}
@@ -134,9 +136,36 @@ public class MainActivity extends Activity {
 
 	// handler for button visitatore in the GUI
 	public void doVisitatore(View view) {
-		// redirect to NavigationActivity
-		settings.edit().putString("eMail", "Visitatore").commit();
-		startActivity(new Intent(this, NavigationActivity.class));
+
+		final Intent intent = new Intent(this, NavigationActivity.class);
+
+		// Check the existence of the Autovelox Fissi file and the auto synch is off 
+		if (!Utils.checkExistenceFile() && !checkAutoSynch()) {
+
+			AlertDialog.Builder builder = new AlertDialog.Builder(this);
+			builder.setMessage("Do you want to download the file?").setTitle("Missing file");
+			
+			// Add the buttons
+			builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+				public void onClick(DialogInterface dialog, int id) {
+					// User clicked OK button
+					settings.edit().putString("eMail", "Visitatore").commit();
+					new DownloadTask(MainActivity.this).execute(urlRemoteServer + "download/fissi");
+					startActivity(intent);
+				}
+			});
+			builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+				public void onClick(DialogInterface dialog, int id) {
+					// User cancelled the dialog
+				}
+			});
+			AlertDialog dialog = builder.create();
+			dialog.show();
+		} else {
+			// redirect to NavigationActivity
+			settings.edit().putString("eMail", "Visitatore").commit();
+			startActivity(intent);
+		}
 	}
 
 	// handler for button register in the GUI

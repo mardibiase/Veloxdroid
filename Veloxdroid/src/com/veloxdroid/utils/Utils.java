@@ -90,4 +90,10 @@ public class Utils {
 			e.printStackTrace();
 		}
 	}
+	
+	public static boolean checkExistenceFile(){
+		
+		File file = new File(MainActivity.avFissi_path);
+		return file.exists();
+	}
 }
