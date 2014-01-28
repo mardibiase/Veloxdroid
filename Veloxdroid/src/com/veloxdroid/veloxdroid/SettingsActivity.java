@@ -1,6 +1,6 @@
 package com.veloxdroid.veloxdroid;
 
-import com.veloxdroid.utils.UploadTask;
+import com.veloxdroid.controller.UploadTask;
 import com.veloxdroid.utils.Utils;
 
 import android.os.Bundle;

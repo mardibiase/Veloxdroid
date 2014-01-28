@@ -1,4 +1,4 @@
-package com.veloxdroid.utils;
+package com.veloxdroid.controller;
 
 import java.io.UnsupportedEncodingException;
 import org.apache.http.HttpEntity;

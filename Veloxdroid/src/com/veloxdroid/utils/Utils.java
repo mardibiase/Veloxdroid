@@ -12,6 +12,7 @@ import java.math.RoundingMode;
 import java.text.NumberFormat;
 import java.util.StringTokenizer;
 
+import com.veloxdroid.controller.UploadTask;
 import com.veloxdroid.veloxdroid.MainActivity;
 
 import android.content.SharedPreferences;

@@ -3,8 +3,8 @@ package com.veloxdroid.veloxdroid;
 import java.math.RoundingMode;
 import java.text.NumberFormat;
 
+import com.veloxdroid.controller.UploadTask;
 import com.veloxdroid.utils.SearcherAutovelox;
-import com.veloxdroid.utils.UploadTask;
 import com.veloxdroid.utils.Utils;
 
 import android.app.Activity;

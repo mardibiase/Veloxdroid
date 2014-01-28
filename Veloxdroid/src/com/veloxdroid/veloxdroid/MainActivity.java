@@ -12,7 +12,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Toast;
 
-import com.veloxdroid.utils.DownloadTask;
+import com.veloxdroid.controller.DownloadTask;
 import com.veloxdroid.utils.Utils;
 
 public class MainActivity extends Activity {
